@@ -1392,9 +1392,9 @@
         ]
       }
     },
-    "/api/admin/users/profile": {
+    "/api/admin/users/me": {
       "get": {
-        "operationId": "UsersController_getProfile",
+        "operationId": "UsersController_getMe",
         "parameters": [],
         "responses": {
           "200": {

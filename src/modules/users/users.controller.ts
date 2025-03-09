@@ -1,3 +1,4 @@
+// src/users.controller.ts
 import {
   Controller,
   Get,
@@ -10,7 +11,7 @@ import {
   Request,
   UseInterceptors,
   UploadedFile,
-  BadRequestException, // Ajout de l'importation
+  BadRequestException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiConsumes, ApiBody, ApiParam } from '@nestjs/swagger';
@@ -59,14 +60,14 @@ export class UsersController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('profile')
+  @Get('me')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Récupérer son propre profil' })
   @ApiResponse({ status: 200, description: 'Profil récupéré avec succès' })
   @ApiResponse({ status: 401, description: 'Non autorisé' })
-  getProfile(@Request() req) {
+  getMe(@Request() req) {
     this.logger.log(`Récupération du profil pour l'utilisateur ${req.user.id}`);
-    return this.usersService.getProfile(req.user.id);
+    return this.usersService.getMe(req);
   }
 
   @UseGuards(JwtAuthGuard)

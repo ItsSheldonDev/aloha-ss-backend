@@ -1,8 +1,9 @@
+// src/users.module.ts
 import { Module } from '@nestjs/common';
 import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
-import * as fs from 'fs'; // Ajout de l'importation
+import * as fs from 'fs';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -16,7 +17,6 @@ import { Logger } from '@nestjs/common';
           const uploadPath = './public/uploads/avatars';
           const logger = new Logger('MulterStorage');
           logger.log(`Destination définie : ${uploadPath}`);
-          // Vérifier ou créer le répertoire
           if (!fs.existsSync(uploadPath)) {
             fs.mkdirSync(uploadPath, { recursive: true });
             logger.log(`Répertoire créé : ${uploadPath}`);
