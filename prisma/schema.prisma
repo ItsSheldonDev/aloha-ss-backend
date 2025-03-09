@@ -1,0 +1,156 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Image {
+  id        String   @id @default(uuid())
+  filename  String
+  alt       String
+  category  Category
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Admin {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  nom       String
+  prenom    String
+  role      Role     @default(ADMIN)
+  avatar    String?
+  createdAt DateTime @default(now())
+}
+
+model Setting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
+model Document {
+  id         String           @id @default(cuid())
+  title      String
+  filename   String
+  category   DocumentCategory
+  size       Int
+  downloads  Int             @default(0)
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+}
+
+model News {
+  id         String   @id @default(cuid())
+  title      String
+  content    String   @db.Text
+  author     String?
+  published  Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model EmailTemplate {
+  id          String      @id @default(cuid())
+  name        String
+  subject     String
+  content     String      @db.Text
+  description String?
+  type        EmailType
+  active      Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model Formation {
+  id                String          @id @default(cuid())
+  titre            String
+  type             TypeFormation
+  date             DateTime
+  duree            String          // Format "7h", "35h" etc.
+  placesTotal      Int
+  placesDisponibles Int
+  prix             Float
+  lieu             String
+  formateur        String
+  statut           StatutFormation @default(PLANIFIEE)
+  inscriptions     Inscription[]
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  @@index([date])
+  @@index([type])
+  @@index([statut])
+}
+
+model Inscription {
+  id            String            @id @default(cuid())
+  formation     Formation         @relation(fields: [formationId], references: [id])
+  formationId   String
+  nom           String
+  prenom        String
+  email         String
+  telephone     String
+  dateNaissance DateTime
+  statut        StatutInscription @default(EN_ATTENTE)
+  message   String?
+  notifie       Boolean           @default(false)
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  @@index([formationId])
+  @@index([statut])
+  @@index([email])
+}
+
+enum EmailType {
+  INSCRIPTION
+  CONTACT
+  NOTIFICATION
+}
+
+enum DocumentCategory {
+  FORMATIONS_PRO
+  MIEUX_NOUS_CONNAITRE
+  CGV
+}
+
+enum Category {
+  formations
+  activites
+  evenements
+}
+
+enum Role {
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum TypeFormation {
+  PSC1
+  PSE1
+  PSE2
+  BNSSA
+  SSA
+  SST
+  BSB
+}
+
+enum StatutFormation {
+  PLANIFIEE
+  EN_COURS 
+  TERMINEE
+  ANNULEE
+}
+
+enum StatutInscription {
+  EN_ATTENTE
+  ACCEPTEE
+  REFUSEE
+  ANNULEE
+}

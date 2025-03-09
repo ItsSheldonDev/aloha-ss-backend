@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      target: production
+    volumes:
+      - aloha_uploads:/usr/src/app/public/uploads
+    command: node dist/main
+    environment:
+      - NODE_ENV=production
+
+  postgres:
+    ports:
+      - "127.0.0.1:5432:5432"
+
+  pgadmin:
+    ports:
+      - "127.0.0.1:5050:80"

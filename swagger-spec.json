@@ -1,0 +1,2441 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/api/formations": {
+      "get": {
+        "operationId": "FormationsController_findAllPublic",
+        "parameters": [
+          {
+            "name": "type",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "PSC1",
+                "PSE1",
+                "PSE2",
+                "BNSSA",
+                "SSA",
+                "SST",
+                "BSB"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "month",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": "2023-12",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Récupérer toutes les formations disponibles (accès public)",
+        "tags": [
+          "formations"
+        ]
+      }
+    },
+    "/api/formations/admin": {
+      "get": {
+        "operationId": "FormationsController_findAll",
+        "parameters": [
+          {
+            "name": "type",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "PSC1",
+                "PSE1",
+                "PSE2",
+                "BNSSA",
+                "SSA",
+                "SST",
+                "BSB"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "month",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": "2023-12",
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "PLANIFIEE",
+                "EN_COURS",
+                "TERMINEE",
+                "ANNULEE"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Récupérer toutes les formations (admin)",
+        "tags": [
+          "formations"
+        ]
+      },
+      "post": {
+        "operationId": "FormationsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateFormationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Créer une nouvelle formation (admin)",
+        "tags": [
+          "formations"
+        ]
+      }
+    },
+    "/api/formations/admin/{id}": {
+      "get": {
+        "operationId": "FormationsController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Récupérer une formation par son ID (admin)",
+        "tags": [
+          "formations"
+        ]
+      },
+      "put": {
+        "operationId": "FormationsController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateFormationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Mettre à jour une formation (admin)",
+        "tags": [
+          "formations"
+        ]
+      },
+      "delete": {
+        "operationId": "FormationsController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Supprimer une formation (admin)",
+        "tags": [
+          "formations"
+        ]
+      }
+    },
+    "/api/formations/admin/{id}/status": {
+      "put": {
+        "operationId": "FormationsController_updateStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateFormationStatusDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Mettre à jour le statut d'une formation (admin)",
+        "tags": [
+          "formations"
+        ]
+      }
+    },
+    "/api/news": {
+      "get": {
+        "operationId": "NewsController_findAllPublic",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Numéro de page pour la pagination",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Nombre d'éléments par page",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des actualités publiées avec pagination"
+          }
+        },
+        "summary": "Récupérer toutes les actualités publiées (accès public)",
+        "tags": [
+          "news"
+        ]
+      }
+    },
+    "/api/news/admin": {
+      "get": {
+        "operationId": "NewsController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Liste de toutes les actualités"
+          },
+          "401": {
+            "description": "Non autorisé"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Récupérer toutes les actualités (admin)",
+        "tags": [
+          "news"
+        ]
+      },
+      "post": {
+        "operationId": "NewsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateNewsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Actualité créée avec succès"
+          },
+          "400": {
+            "description": "Données invalides"
+          },
+          "401": {
+            "description": "Non autorisé"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Créer une nouvelle actualité (admin)",
+        "tags": [
+          "news"
+        ]
+      }
+    },
+    "/api/news/admin/{id}": {
+      "get": {
+        "operationId": "NewsController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "ID de l'actualité",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Détails de l'actualité"
+          },
+          "401": {
+            "description": "Non autorisé"
+          },
+          "404": {
+            "description": "Actualité non trouvée"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Récupérer une actualité par son ID (admin)",
+        "tags": [
+          "news"
+        ]
+      },
+      "put": {
+        "operationId": "NewsController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "ID de l'actualité à mettre à jour",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateNewsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Actualité mise à jour avec succès"
+          },
+          "400": {
+            "description": "Données invalides"
+          },
+          "401": {
+            "description": "Non autorisé"
+          },
+          "404": {
+            "description": "Actualité non trouvée"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Mettre à jour une actualité (admin)",
+        "tags": [
+          "news"
+        ]
+      },
+      "delete": {
+        "operationId": "NewsController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "ID de l'actualité à supprimer",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Actualité supprimée avec succès"
+          },
+          "401": {
+            "description": "Non autorisé"
+          },
+          "404": {
+            "description": "Actualité non trouvée"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Supprimer une actualité (admin)",
+        "tags": [
+          "news"
+        ]
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "operationId": "AuthController_login",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Authentification réussie"
+          },
+          "401": {
+            "description": "Authentification échouée"
+          }
+        },
+        "summary": "Authentification d'un administrateur",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/profile": {
+      "get": {
+        "operationId": "AuthController_getProfile",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Profil récupéré avec succès"
+          },
+          "401": {
+            "description": "Non autorisé"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Récupérer le profil de l'utilisateur connecté",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/inscriptions": {
+      "post": {
+        "operationId": "InscriptionsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateInscriptionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Inscription créée avec succès"
+          },
+          "400": {
+            "description": "Données invalides ou plus de places disponibles"
+          },
+          "404": {
+            "description": "Formation non trouvée"
+          }
+        },
+        "summary": "Créer une nouvelle inscription (accès public)",
+        "tags": [
+          "inscriptions"
+        ]
+      }
+    },
+    "/api/inscriptions/admin": {
+      "get": {
+        "operationId": "InscriptionsController_findAll",
+        "parameters": [
+          {
+            "name": "formationId",
+            "required": false,
+            "in": "query",
+            "description": "Filtrer par ID de formation",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "Filtrer par statut",
+            "schema": {
+              "enum": [
+                "EN_ATTENTE",
+                "ACCEPTEE",
+                "REFUSEE",
+                "ANNULEE"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Rechercher par nom, prénom ou email",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des inscriptions récupérée avec succès"
+          },
+          "401": {
+            "description": "Non autorisé"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Récupérer toutes les inscriptions (admin)",
+        "tags": [
+          "inscriptions"
+        ]
+      }
+    },
+    "/api/inscriptions/admin/{id}": {
+      "get": {
+        "operationId": "InscriptionsController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "ID de l'inscription",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Inscription récupérée avec succès"
+          },
+          "401": {
+            "description": "Non autorisé"
+          },
+          "404": {
+            "description": "Inscription non trouvée"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Récupérer une inscription par son ID (admin)",
+        "tags": [
+          "inscriptions"
+        ]
+      },
+      "put": {
+        "operationId": "InscriptionsController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "ID de l'inscription",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateInscriptionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Inscription mise à jour avec succès"
+          },
+          "401": {
+            "description": "Non autorisé"
+          },
+          "404": {
+            "description": "Inscription non trouvée"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Mettre à jour une inscription (admin)",
+        "tags": [
+          "inscriptions"
+        ]
+      },
+      "delete": {
+        "operationId": "InscriptionsController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "ID de l'inscription",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Inscription supprimée avec succès"
+          },
+          "401": {
+            "description": "Non autorisé"
+          },
+          "404": {
+            "description": "Inscription non trouvée"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Supprimer une inscription (admin)",
+        "tags": [
+          "inscriptions"
+        ]
+      }
+    },
+    "/api/inscriptions/admin/{id}/status": {
+      "put": {
+        "operationId": "InscriptionsController_updateStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "ID de l'inscription",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateInscriptionStatusDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Statut mis à jour avec succès"
+          },
+          "401": {
+            "description": "Non autorisé"
+          },
+          "404": {
+            "description": "Inscription non trouvée"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Mettre à jour le statut d'une inscription (admin)",
+        "tags": [
+          "inscriptions"
+        ]
+      }
+    },
+    "/api/documents": {
+      "get": {
+        "operationId": "DocumentsController_findAll",
+        "parameters": [
+          {
+            "name": "category",
+            "required": false,
+            "in": "query",
+            "description": "Filtrer par catégorie",
+            "schema": {
+              "enum": [
+                "FORMATIONS_PRO",
+                "MIEUX_NOUS_CONNAITRE",
+                "CGV"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des documents récupérée avec succès"
+          }
+        },
+        "summary": "Récupérer tous les documents (accès public)",
+        "tags": [
+          "documents"
+        ]
+      }
+    },
+    "/api/documents/{id}/download": {
+      "get": {
+        "operationId": "DocumentsController_download",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "ID du document",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Document téléchargé avec succès"
+          },
+          "404": {
+            "description": "Document non trouvé"
+          }
+        },
+        "summary": "Télécharger un document (accès public)",
+        "tags": [
+          "documents"
+        ]
+      }
+    },
+    "/api/documents/{id}/count": {
+      "get": {
+        "operationId": "DocumentsController_getDownloadCount",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "ID du document",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Nombre de téléchargements récupéré avec succès"
+          },
+          "404": {
+            "description": "Document non trouvé"
+          }
+        },
+        "summary": "Récupérer le nombre de téléchargements d'un document (accès public)",
+        "tags": [
+          "documents"
+        ]
+      },
+      "post": {
+        "operationId": "DocumentsController_incrementDownloadCount",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "ID du document",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Compteur incrémenté avec succès"
+          },
+          "404": {
+            "description": "Document non trouvé"
+          }
+        },
+        "summary": "Incrémenter le compteur de téléchargements (accès public)",
+        "tags": [
+          "documents"
+        ]
+      }
+    },
+    "/api/documents/admin": {
+      "post": {
+        "operationId": "DocumentsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "category": {
+                    "type": "string",
+                    "enum": [
+                      "FORMATIONS_PRO",
+                      "MIEUX_NOUS_CONNAITRE",
+                      "CGV"
+                    ]
+                  },
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Document créé avec succès"
+          },
+          "400": {
+            "description": "Données invalides ou fichier manquant"
+          },
+          "401": {
+            "description": "Non autorisé"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Créer un nouveau document (admin)",
+        "tags": [
+          "documents"
+        ]
+      },
+      "get": {
+        "operationId": "DocumentsController_findAllAdmin",
+        "parameters": [
+          {
+            "name": "category",
+            "required": false,
+            "in": "query",
+            "description": "Filtrer par catégorie",
+            "schema": {
+              "enum": [
+                "FORMATIONS_PRO",
+                "MIEUX_NOUS_CONNAITRE",
+                "CGV"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des documents récupérée avec succès"
+          },
+          "401": {
+            "description": "Non autorisé"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Récupérer tous les documents (admin)",
+        "tags": [
+          "documents"
+        ]
+      }
+    },
+    "/api/documents/admin/{id}": {
+      "get": {
+        "operationId": "DocumentsController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "ID du document",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Document récupéré avec succès"
+          },
+          "401": {
+            "description": "Non autorisé"
+          },
+          "404": {
+            "description": "Document non trouvé"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Récupérer un document par son ID (admin)",
+        "tags": [
+          "documents"
+        ]
+      },
+      "put": {
+        "operationId": "DocumentsController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "ID du document",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDocumentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Document mis à jour avec succès"
+          },
+          "401": {
+            "description": "Non autorisé"
+          },
+          "404": {
+            "description": "Document non trouvé"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Mettre à jour un document (admin)",
+        "tags": [
+          "documents"
+        ]
+      },
+      "delete": {
+        "operationId": "DocumentsController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "ID du document",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Document supprimé avec succès"
+          },
+          "401": {
+            "description": "Non autorisé"
+          },
+          "404": {
+            "description": "Document non trouvé"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Supprimer un document (admin)",
+        "tags": [
+          "documents"
+        ]
+      }
+    },
+    "/api/gallery": {
+      "get": {
+        "operationId": "GalleryController_findAll",
+        "parameters": [
+          {
+            "name": "category",
+            "required": false,
+            "in": "query",
+            "description": "Filtrer par catégorie",
+            "schema": {
+              "enum": [
+                "formations",
+                "activites",
+                "evenements"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "mode",
+            "required": false,
+            "in": "query",
+            "description": "Mode de récupération (all = par catégorie, random = images aléatoires)",
+            "schema": {
+              "enum": [
+                "all",
+                "random"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des images récupérée avec succès"
+          }
+        },
+        "summary": "Récupérer toutes les images (accès public)",
+        "tags": [
+          "gallery"
+        ]
+      }
+    },
+    "/api/gallery/admin": {
+      "post": {
+        "operationId": "GalleryController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "alt": {
+                    "type": "string"
+                  },
+                  "category": {
+                    "type": "string",
+                    "enum": [
+                      "formations",
+                      "activites",
+                      "evenements"
+                    ]
+                  },
+                  "image": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Image créée avec succès"
+          },
+          "400": {
+            "description": "Données invalides ou fichier manquant"
+          },
+          "401": {
+            "description": "Non autorisé"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Télécharger une nouvelle image (admin)",
+        "tags": [
+          "gallery"
+        ]
+      },
+      "get": {
+        "operationId": "GalleryController_findAllAdmin",
+        "parameters": [
+          {
+            "name": "category",
+            "required": false,
+            "in": "query",
+            "description": "Filtrer par catégorie",
+            "schema": {
+              "enum": [
+                "formations",
+                "activites",
+                "evenements"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des images récupérée avec succès"
+          },
+          "401": {
+            "description": "Non autorisé"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Récupérer toutes les images (admin)",
+        "tags": [
+          "gallery"
+        ]
+      }
+    },
+    "/api/gallery/admin/{id}": {
+      "get": {
+        "operationId": "GalleryController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "ID de l'image",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Image récupérée avec succès"
+          },
+          "401": {
+            "description": "Non autorisé"
+          },
+          "404": {
+            "description": "Image non trouvée"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Récupérer une image par son ID (admin)",
+        "tags": [
+          "gallery"
+        ]
+      },
+      "put": {
+        "operationId": "GalleryController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "ID de l'image",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateImageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Image mise à jour avec succès"
+          },
+          "401": {
+            "description": "Non autorisé"
+          },
+          "404": {
+            "description": "Image non trouvée"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Mettre à jour une image (admin)",
+        "tags": [
+          "gallery"
+        ]
+      },
+      "delete": {
+        "operationId": "GalleryController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "ID de l'image",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Image supprimée avec succès"
+          },
+          "401": {
+            "description": "Non autorisé"
+          },
+          "404": {
+            "description": "Image non trouvée"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Supprimer une image (admin)",
+        "tags": [
+          "gallery"
+        ]
+      }
+    },
+    "/api/admin/users": {
+      "post": {
+        "operationId": "UsersController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Administrateur créé avec succès"
+          },
+          "400": {
+            "description": "Données invalides"
+          },
+          "401": {
+            "description": "Non autorisé"
+          },
+          "403": {
+            "description": "Accès interdit"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Créer un nouvel administrateur (super admin uniquement)",
+        "tags": [
+          "users"
+        ]
+      },
+      "get": {
+        "operationId": "UsersController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Liste des administrateurs récupérée avec succès"
+          },
+          "401": {
+            "description": "Non autorisé"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Récupérer la liste des administrateurs",
+        "tags": [
+          "users"
+        ]
+      }
+    },
+    "/api/admin/users/profile": {
+      "get": {
+        "operationId": "UsersController_getProfile",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Profil récupéré avec succès"
+          },
+          "401": {
+            "description": "Non autorisé"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Récupérer son propre profil",
+        "tags": [
+          "users"
+        ]
+      }
+    },
+    "/api/admin/users/profile/password": {
+      "put": {
+        "operationId": "UsersController_changePassword",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Mot de passe changé avec succès"
+          },
+          "400": {
+            "description": "Mot de passe actuel incorrect"
+          },
+          "401": {
+            "description": "Non autorisé"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Changer son propre mot de passe",
+        "tags": [
+          "users"
+        ]
+      }
+    },
+    "/api/admin/users/profile/avatar": {
+      "put": {
+        "operationId": "UsersController_updateAvatar",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "avatar": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Avatar mis à jour avec succès"
+          },
+          "400": {
+            "description": "Fichier manquant ou invalide"
+          },
+          "401": {
+            "description": "Non autorisé"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Mettre à jour son propre avatar",
+        "tags": [
+          "users"
+        ]
+      }
+    },
+    "/api/admin/users/{id}": {
+      "get": {
+        "operationId": "UsersController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "ID de l'administrateur",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Administrateur récupéré avec succès"
+          },
+          "401": {
+            "description": "Non autorisé"
+          },
+          "404": {
+            "description": "Administrateur non trouvé"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Récupérer un administrateur par son ID",
+        "tags": [
+          "users"
+        ]
+      },
+      "put": {
+        "operationId": "UsersController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "ID de l'administrateur",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Administrateur mis à jour avec succès"
+          },
+          "401": {
+            "description": "Non autorisé"
+          },
+          "403": {
+            "description": "Accès interdit"
+          },
+          "404": {
+            "description": "Administrateur non trouvé"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Mettre à jour un administrateur (super admin uniquement)",
+        "tags": [
+          "users"
+        ]
+      },
+      "delete": {
+        "operationId": "UsersController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "ID de l'administrateur",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Administrateur supprimé avec succès"
+          },
+          "401": {
+            "description": "Non autorisé"
+          },
+          "403": {
+            "description": "Accès interdit"
+          },
+          "404": {
+            "description": "Administrateur non trouvé"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Supprimer un administrateur (super admin uniquement)",
+        "tags": [
+          "users"
+        ]
+      }
+    },
+    "/api/admin/settings": {
+      "get": {
+        "operationId": "SettingsController_getSettings",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Paramètres récupérés avec succès"
+          },
+          "401": {
+            "description": "Non autorisé"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Récupérer les paramètres du système",
+        "tags": [
+          "settings"
+        ]
+      },
+      "post": {
+        "operationId": "SettingsController_updateSettings",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSettingsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Paramètres mis à jour avec succès"
+          },
+          "401": {
+            "description": "Non autorisé"
+          },
+          "403": {
+            "description": "Accès interdit"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Mettre à jour les paramètres du système (super admin uniquement)",
+        "tags": [
+          "settings"
+        ]
+      }
+    },
+    "/api/admin/database/stats": {
+      "get": {
+        "operationId": "DatabaseController_getDatabaseStats",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Statistiques récupérées avec succès"
+          },
+          "401": {
+            "description": "Non autorisé"
+          },
+          "403": {
+            "description": "Accès interdit"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Récupérer les statistiques de la base de données (super admin uniquement)",
+        "tags": [
+          "database"
+        ]
+      }
+    },
+    "/api/admin/database/export": {
+      "post": {
+        "operationId": "DatabaseController_exportDatabase",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Base de données exportée avec succès"
+          },
+          "401": {
+            "description": "Non autorisé"
+          },
+          "403": {
+            "description": "Accès interdit"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Exporter la base de données (super admin uniquement)",
+        "tags": [
+          "database"
+        ]
+      }
+    },
+    "/api/admin/database/import": {
+      "post": {
+        "operationId": "DatabaseController_importDatabase",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Base de données importée avec succès"
+          },
+          "400": {
+            "description": "Fichier invalide"
+          },
+          "401": {
+            "description": "Non autorisé"
+          },
+          "403": {
+            "description": "Accès interdit"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Importer la base de données (super admin uniquement)",
+        "tags": [
+          "database"
+        ]
+      }
+    },
+    "/api/admin/database/reset": {
+      "post": {
+        "operationId": "DatabaseController_resetDatabase",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Base de données réinitialisée avec succès"
+          },
+          "401": {
+            "description": "Non autorisé"
+          },
+          "403": {
+            "description": "Accès interdit"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Réinitialiser la base de données (super admin uniquement)",
+        "tags": [
+          "database"
+        ]
+      }
+    },
+    "/api/admin/dashboard/stats": {
+      "get": {
+        "operationId": "DashboardController_getStats",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Statistiques récupérées avec succès"
+          },
+          "401": {
+            "description": "Non autorisé"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Récupérer les statistiques pour le tableau de bord",
+        "tags": [
+          "dashboard"
+        ]
+      }
+    },
+    "/api/admin/dashboard/yearly-stats": {
+      "get": {
+        "operationId": "DashboardController_getYearlyStats",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Statistiques annuelles récupérées avec succès"
+          },
+          "401": {
+            "description": "Non autorisé"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Récupérer les statistiques annuelles",
+        "tags": [
+          "dashboard"
+        ]
+      }
+    },
+    "/api/admin/dashboard/inscription-trends": {
+      "get": {
+        "operationId": "DashboardController_getInscriptionTrends",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Tendances récupérées avec succès"
+          },
+          "401": {
+            "description": "Non autorisé"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Récupérer les tendances d'inscription",
+        "tags": [
+          "dashboard"
+        ]
+      }
+    },
+    "/api/health": {
+      "get": {
+        "operationId": "HealthController_check",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "L'API fonctionne correctement"
+          }
+        },
+        "summary": "Vérifier l'état de santé de l'API",
+        "tags": [
+          "health"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "API Aloha Secourisme",
+    "description": "\n      API REST complète pour la gestion de l'application Aloha Secourisme.\n      \n      Cette API permet de gérer les formations, les inscriptions, les documents, \n      la galerie d'images et l'administration du système.\n      \n      ## Authentification\n      \n      La plupart des endpoints nécessitent une authentification par token JWT.\n      Pour vous authentifier, utilisez l'endpoint `/api/auth/login` pour obtenir un token,\n      puis incluez ce token dans l'en-tête d'autorisation de vos requêtes.\n      \n      ## Rôles\n      \n      - **Accès public** : Accessible sans authentification\n      - **Admin** : Nécessite d'être connecté avec un compte administrateur\n      - **Super Admin** : Nécessite d'être connecté avec un compte super administrateur\n      \n      ## Modules principaux\n      \n      - **Formations** : Gestion des sessions de formation\n      - **Inscriptions** : Gestion des inscriptions aux formations\n      - **Documents** : Gestion des documents téléchargeables\n      - **Galerie** : Gestion des images de la galerie\n      - **News** : Gestion des actualités\n      - **Admin/Users** : Gestion des utilisateurs administrateurs\n      - **Dashboard** : Statistiques et tableaux de bord\n      - **Settings** : Paramètres du système\n      - **Database** : Export/import de la base de données\n    ",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Aloha Secourisme",
+      "url": "https://www.aloha-secourisme.fr",
+      "email": "contact@aloha-secourisme.fr"
+    },
+    "license": {
+      "name": "Propriétaire",
+      "url": "https://www.aloha-secourisme.fr"
+    }
+  },
+  "tags": [],
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Serveur local"
+    },
+    {
+      "url": "https://api.aloha-secourisme.fr",
+      "description": "Serveur de production"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "JWT-auth": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http",
+        "description": "Entrez votre token JWT ici"
+      }
+    },
+    "schemas": {
+      "CreateFormationDto": {
+        "type": "object",
+        "properties": {
+          "titre": {
+            "type": "string",
+            "example": "Formation PSC1",
+            "description": "Titre de la formation"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "PSC1",
+              "PSE1",
+              "PSE2",
+              "BNSSA",
+              "SSA",
+              "SST",
+              "BSB"
+            ],
+            "description": "Type de formation",
+            "example": "PSC1"
+          },
+          "date": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2023-12-01T09:00:00Z",
+            "description": "Date de la formation"
+          },
+          "duree": {
+            "type": "string",
+            "example": "7h",
+            "description": "Durée de la formation"
+          },
+          "placesTotal": {
+            "type": "number",
+            "example": 12,
+            "description": "Nombre total de places"
+          },
+          "prix": {
+            "type": "number",
+            "example": 89.99,
+            "description": "Prix de la formation"
+          },
+          "lieu": {
+            "type": "string",
+            "example": "Lyon",
+            "description": "Lieu de la formation"
+          },
+          "formateur": {
+            "type": "string",
+            "example": "Jean Dupont",
+            "description": "Nom du formateur"
+          }
+        },
+        "required": [
+          "titre",
+          "type",
+          "date",
+          "duree",
+          "placesTotal",
+          "prix",
+          "lieu",
+          "formateur"
+        ]
+      },
+      "UpdateFormationDto": {
+        "type": "object",
+        "properties": {
+          "titre": {
+            "type": "string",
+            "example": "Formation PSC1",
+            "description": "Titre de la formation"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "PSC1",
+              "PSE1",
+              "PSE2",
+              "BNSSA",
+              "SSA",
+              "SST",
+              "BSB"
+            ],
+            "description": "Type de formation",
+            "example": "PSC1"
+          },
+          "date": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2023-12-01T09:00:00Z",
+            "description": "Date de la formation"
+          },
+          "duree": {
+            "type": "string",
+            "example": "7h",
+            "description": "Durée de la formation"
+          },
+          "placesTotal": {
+            "type": "number",
+            "example": 12,
+            "description": "Nombre total de places"
+          },
+          "prix": {
+            "type": "number",
+            "example": 89.99,
+            "description": "Prix de la formation"
+          },
+          "lieu": {
+            "type": "string",
+            "example": "Lyon",
+            "description": "Lieu de la formation"
+          },
+          "formateur": {
+            "type": "string",
+            "example": "Jean Dupont",
+            "description": "Nom du formateur"
+          }
+        }
+      },
+      "UpdateFormationStatusDto": {
+        "type": "object",
+        "properties": {
+          "statut": {
+            "type": "string",
+            "enum": [
+              "PLANIFIEE",
+              "EN_COURS",
+              "TERMINEE",
+              "ANNULEE"
+            ],
+            "description": "Statut de la formation",
+            "example": "EN_COURS"
+          }
+        },
+        "required": [
+          "statut"
+        ]
+      },
+      "CreateNewsDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "Nouvelle formation PSC1",
+            "description": "Titre de l'actualité"
+          },
+          "content": {
+            "type": "string",
+            "example": "Contenu détaillé de l'actualité...",
+            "description": "Contenu de l'actualité"
+          },
+          "author": {
+            "type": "string",
+            "example": "John Doe",
+            "description": "Auteur de l'actualité"
+          },
+          "published": {
+            "type": "boolean",
+            "example": true,
+            "description": "Statut de publication",
+            "default": true
+          }
+        },
+        "required": [
+          "title",
+          "content",
+          "published"
+        ]
+      },
+      "UpdateNewsDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "Nouvelle formation PSC1",
+            "description": "Titre de l'actualité"
+          },
+          "content": {
+            "type": "string",
+            "example": "Contenu détaillé de l'actualité...",
+            "description": "Contenu de l'actualité"
+          },
+          "author": {
+            "type": "string",
+            "example": "John Doe",
+            "description": "Auteur de l'actualité"
+          },
+          "published": {
+            "type": "boolean",
+            "example": true,
+            "description": "Statut de publication",
+            "default": true
+          }
+        }
+      },
+      "LoginDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "admin@example.com",
+            "description": "Adresse email de l'utilisateur"
+          },
+          "password": {
+            "type": "string",
+            "example": "password123",
+            "description": "Mot de passe de l'utilisateur"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "CreateInscriptionDto": {
+        "type": "object",
+        "properties": {
+          "nom": {
+            "type": "string",
+            "example": "Dupont",
+            "description": "Nom de famille du participant"
+          },
+          "prenom": {
+            "type": "string",
+            "example": "Jean",
+            "description": "Prénom du participant"
+          },
+          "email": {
+            "type": "string",
+            "example": "jean.dupont@example.com",
+            "description": "Email du participant"
+          },
+          "telephone": {
+            "type": "string",
+            "example": "0612345678",
+            "description": "Numéro de téléphone du participant"
+          },
+          "dateNaissance": {
+            "type": "string",
+            "example": "1990-01-15",
+            "description": "Date de naissance du participant (format ISO)"
+          },
+          "formationId": {
+            "type": "string",
+            "example": "abc123def456",
+            "description": "ID de la formation à laquelle le participant souhaite s'inscrire"
+          },
+          "message": {
+            "type": "string",
+            "example": "Allergie aux arachides, besoin d'un accès PMR",
+            "description": "Message ou informations complémentaires"
+          }
+        },
+        "required": [
+          "nom",
+          "prenom",
+          "email",
+          "telephone",
+          "dateNaissance",
+          "formationId"
+        ]
+      },
+      "UpdateInscriptionDto": {
+        "type": "object",
+        "properties": {
+          "nom": {
+            "type": "string",
+            "example": "Dupont",
+            "description": "Nom de famille du participant"
+          },
+          "prenom": {
+            "type": "string",
+            "example": "Jean",
+            "description": "Prénom du participant"
+          },
+          "email": {
+            "type": "string",
+            "example": "jean.dupont@example.com",
+            "description": "Email du participant"
+          },
+          "telephone": {
+            "type": "string",
+            "example": "0612345678",
+            "description": "Numéro de téléphone du participant"
+          },
+          "dateNaissance": {
+            "type": "string",
+            "example": "1990-01-15",
+            "description": "Date de naissance du participant (format ISO)"
+          },
+          "message": {
+            "type": "string",
+            "example": "Allergie aux arachides, besoin d'un accès PMR",
+            "description": "Message ou informations complémentaires"
+          },
+          "statut": {
+            "type": "string",
+            "enum": [
+              "EN_ATTENTE",
+              "ACCEPTEE",
+              "REFUSEE",
+              "ANNULEE"
+            ],
+            "description": "Statut de l'inscription"
+          },
+          "notifie": {
+            "type": "boolean",
+            "example": false,
+            "description": "Indique si l'utilisateur a été notifié"
+          }
+        }
+      },
+      "UpdateInscriptionStatusDto": {
+        "type": "object",
+        "properties": {
+          "statut": {
+            "type": "string",
+            "enum": [
+              "EN_ATTENTE",
+              "ACCEPTEE",
+              "REFUSEE",
+              "ANNULEE"
+            ],
+            "description": "Nouveau statut de l'inscription",
+            "example": "ACCEPTEE"
+          }
+        },
+        "required": [
+          "statut"
+        ]
+      },
+      "UpdateDocumentDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "Fiche formation PSC1",
+            "description": "Titre du document"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "FORMATIONS_PRO",
+              "MIEUX_NOUS_CONNAITRE",
+              "CGV"
+            ],
+            "description": "Catégorie du document",
+            "example": "FORMATIONS_PRO"
+          }
+        }
+      },
+      "UpdateImageDto": {
+        "type": "object",
+        "properties": {
+          "alt": {
+            "type": "string",
+            "example": "Formation PSC1 - juin 2023",
+            "description": "Description de l'image"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "formations",
+              "activites",
+              "evenements"
+            ],
+            "description": "Catégorie de l'image",
+            "example": "formations"
+          }
+        }
+      },
+      "CreateUserDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "admin@example.com",
+            "description": "Email de l'administrateur"
+          },
+          "password": {
+            "type": "string",
+            "example": "Password123!",
+            "description": "Mot de passe (min 8 caractères)"
+          },
+          "nom": {
+            "type": "string",
+            "example": "Dupont",
+            "description": "Nom de famille"
+          },
+          "prenom": {
+            "type": "string",
+            "example": "Jean",
+            "description": "Prénom"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "ADMIN",
+              "SUPER_ADMIN"
+            ],
+            "description": "Rôle de l'administrateur",
+            "example": "ADMIN"
+          }
+        },
+        "required": [
+          "email",
+          "password",
+          "nom",
+          "prenom",
+          "role"
+        ]
+      },
+      "ChangePasswordDto": {
+        "type": "object",
+        "properties": {
+          "currentPassword": {
+            "type": "string",
+            "example": "CurrentPassword123!",
+            "description": "Mot de passe actuel"
+          },
+          "newPassword": {
+            "type": "string",
+            "example": "NewPassword123!",
+            "description": "Nouveau mot de passe (min 8 caractères)"
+          }
+        },
+        "required": [
+          "currentPassword",
+          "newPassword"
+        ]
+      },
+      "UpdateUserDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "admin@example.com",
+            "description": "Email de l'administrateur"
+          },
+          "nom": {
+            "type": "string",
+            "example": "Dupont",
+            "description": "Nom de famille"
+          },
+          "prenom": {
+            "type": "string",
+            "example": "Jean",
+            "description": "Prénom"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "ADMIN",
+              "SUPER_ADMIN"
+            ],
+            "description": "Rôle de l'administrateur",
+            "example": "ADMIN"
+          },
+          "password": {
+            "type": "string",
+            "example": "NewPassword123!",
+            "description": "Nouveau mot de passe (min 8 caractères)"
+          }
+        }
+      },
+      "ContactSettingsDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "contact@aloha-secourisme.fr"
+          },
+          "phone": {
+            "type": "string",
+            "example": "06 12 34 56 78"
+          },
+          "address": {
+            "type": "string",
+            "example": "123 rue de la Paix, 75000 Paris"
+          }
+        }
+      },
+      "SocialSettingsDto": {
+        "type": "object",
+        "properties": {
+          "facebook": {
+            "type": "string",
+            "example": "https://facebook.com/aloha-secourisme"
+          },
+          "instagram": {
+            "type": "string",
+            "example": "https://instagram.com/aloha-secourisme"
+          }
+        }
+      },
+      "NotificationSettingsDto": {
+        "type": "object",
+        "properties": {
+          "emailInscription": {
+            "type": "boolean",
+            "example": true
+          },
+          "emailContact": {
+            "type": "boolean",
+            "example": true
+          }
+        }
+      },
+      "UpdateSettingsDto": {
+        "type": "object",
+        "properties": {
+          "contact": {
+            "$ref": "#/components/schemas/ContactSettingsDto"
+          },
+          "social": {
+            "$ref": "#/components/schemas/SocialSettingsDto"
+          },
+          "notifications": {
+            "$ref": "#/components/schemas/NotificationSettingsDto"
+          }
+        }
+      }
+    }
+  }
+}

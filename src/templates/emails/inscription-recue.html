@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Confirmation de réception de votre inscription</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: white;
+    }
+    .header {
+      background-color: #0e5399;
+      padding: 20px;
+      text-align: center;
+    }
+    .header img {
+      max-width: 200px;
+      height: auto;
+    }
+    .header h1 {
+      color: white;
+      margin: 10px 0;
+      font-size: 24px;
+    }
+    .content {
+      padding: 20px;
+    }
+    .info-box {
+      background-color: #f8f9fa;
+      border-radius: 5px;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+    .info-item {
+      margin-bottom: 10px;
+    }
+    .label {
+      font-weight: bold;
+      color: #0e5399;
+    }
+    .footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 12px;
+      color: #666;
+      background-color: #f4f4f4;
+    }
+    .btn {
+      display: inline-block;
+      padding: 10px 20px;
+      margin: 20px 0;
+      background-color: #0e5399;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <img src="https://www.aloha-secourisme.fr/images/logo-white.png" alt="Aloha Secourisme">
+      <h1>Inscription reçue avec succès !</h1>
+    </div>
+    <div class="content">
+      <p>Bonjour {{prenom}} {{nom}},</p>
+      
+      <p>Nous avons bien reçu votre inscription à la formation suivante :</p>
+      
+      <div class="info-box">
+        <div class="info-item">
+          <span class="label">Formation :</span> {{formation}}
+        </div>
+        <div class="info-item">
+          <span class="label">Date :</span> {{date}}
+        </div>
+        <div class="info-item">
+          <span class="label">Lieu :</span> {{lieu}}
+        </div>
+        <div class="info-item">
+          <span class="label">Durée :</span> {{duree}}
+        </div>
+      </div>
+      
+      <p>Votre demande d'inscription va être traitée par l'un de nos formateurs <strong>dans un délai de 48 heures ouvrées</strong>. Vous recevrez un email de confirmation une fois votre inscription validée.</p>
+      
+      <p>En attendant, n'hésitez pas à consulter notre <a href="https://www.aloha-secourisme.fr/faq">FAQ</a> pour toute question concernant nos formations.</p>
+      
+      <p>Si vous avez des questions spécifiques, vous pouvez nous contacter par email à <a href="mailto:contact@aloha-secourisme.fr">contact@aloha-secourisme.fr</a> ou par téléphone au <a href="tel:+33612345678">06 12 34 56 78</a>.</p>
+      
+      <p>Nous vous remercions de votre confiance et avons hâte de vous accueillir à cette formation.</p>
+      
+      <p>Cordialement,<br>L'équipe Aloha Secourisme</p>
+    </div>
+    <div class="footer">
+      <p>Aloha Secourisme - Formation aux premiers secours<br>
+      123 Rue des Secouristes, 75000 Paris<br>
+      <a href="https://www.aloha-secourisme.fr">www.aloha-secourisme.fr</a></p>
+      <p>Cet email a été envoyé automatiquement, merci de ne pas y répondre.</p>
+    </div>
+  </div>
+</body>
+</html>
