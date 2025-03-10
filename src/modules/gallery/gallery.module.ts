@@ -10,7 +10,7 @@ import { extname } from 'path';
   imports: [
     MulterModule.register({
       storage: diskStorage({
-        destination: './uploads/temp', // Stockage temporaire, puisque nous utilisons Sharp pour traiter les images
+        destination: './uploads/temp', // Stockage temporaire
         filename: (req, file, callback) => {
           const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
           const ext = extname(file.originalname);
@@ -18,8 +18,10 @@ import { extname } from 'path';
         },
       }),
       fileFilter: (req, file, callback) => {
-        if (!file.mimetype.match(/\/(jpg|jpeg|png|webp)$/)) {
-          return callback(new Error('Seules les images sont autorisées'), false);
+        const allowedTypes = /jpg|jpeg|png|webp/;
+        const isValid = allowedTypes.test(file.mimetype);
+        if (!isValid) {
+          return callback(new Error(`Type de fichier non autorisé : ${file.mimetype}. Types acceptés : jpg, jpeg, png, webp`), false);
         }
         callback(null, true);
       },

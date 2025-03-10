@@ -24,6 +24,7 @@ export class GalleryService {
   private async ensureUploadDirectory(): Promise<void> {
     try {
       await fs.mkdir(this.uploadDirectory, { recursive: true });
+      this.logger.log(`Répertoire d'upload créé ou déjà existant : ${this.uploadDirectory}`);
     } catch (error) {
       this.logger.error(`Erreur lors de la création du répertoire : ${error.message}`);
     }
@@ -31,15 +32,17 @@ export class GalleryService {
 
   async create(createImageDto: CreateImageDto, file: Express.Multer.File): Promise<Image> {
     try {
+      this.logger.log(`Début de la création d'image : alt=${createImageDto.alt}, category=${createImageDto.category}`);
+
       if (!file) {
         throw new BadRequestException('Fichier image requis');
       }
 
+      this.logger.log(`Fichier reçu : originalname=${file.originalname}, size=${file.size} bytes, mimetype=${file.mimetype}, buffer length=${file.buffer?.length || 0}`);
+
       if (!file.buffer || file.buffer.length === 0) {
         throw new BadRequestException('Buffer du fichier image vide');
       }
-
-      this.logger.log(`Fichier reçu : ${file.originalname}, taille=${file.size} bytes, mimetype=${file.mimetype}`);
 
       // Vérifier la taille du fichier
       if (file.size > this.maxFileSize) {
