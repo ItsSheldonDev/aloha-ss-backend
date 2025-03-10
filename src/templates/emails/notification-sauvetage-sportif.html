@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nouvelle inscription - Sauvetage Sportif</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: 20px auto;
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      color: #0e5399;
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    p {
+      color: #333;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    li {
+      margin-bottom: 10px;
+      color: #555;
+    }
+    .footer {
+      margin-top: 20px;
+      font-size: 12px;
+      color: #777;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Nouvelle inscription - Sauvetage Sportif</h1>
+    <p>Une nouvelle inscription a été reçue. Voici les détails :</p>
+    <ul>
+      <li><strong>Nom :</strong> {{inscription.name}}</li>
+      <li><strong>Prénom :</strong> {{inscription.firstname}}</li>
+      <li><strong>Email :</strong> {{inscription.email}}</li>
+      <li><strong>Téléphone :</strong> {{inscription.phone}}</li>
+      <li><strong>Date de naissance :</strong> {{inscription.birthdate}}</li>
+      <li><strong>Observations :</strong> {{inscription.observation}}</li>
+    </ul>
+    <p>Merci de traiter cette demande dans les plus brefs délais.</p>
+    <div class="footer">
+      <p>Cet email a été envoyé automatiquement par Aloha Sauvetage Secourisme.</p>
+    </div>
+  </div>
+</body>
+</html>

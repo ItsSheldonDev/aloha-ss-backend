@@ -1,3 +1,4 @@
+// src/modules/inscriptions/inscriptions.service.ts
 import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateInscriptionDto } from './dto/create-inscription.dto';
@@ -112,6 +113,37 @@ export class InscriptionsService {
     } catch (error) {
       this.logger.error(`Erreur lors de la création d'une inscription: ${error.message}`, error.stack);
       throw error;
+    }
+  }
+
+  async sendSauvetageSportifInscription(body: { firstname: string; name: string; email: string; phone: string; birthdate: string; observation: string }): Promise<{ message: string }> {
+    try {
+      const adminEmail = process.env.ADMIN_EMAIL;
+      if (!adminEmail) {
+        throw new BadRequestException('Adresse email de l\'admin non configurée');
+      }
+
+      // Envoyer un email à l'admin
+      await this.emailsService.sendEmail({
+        to: adminEmail,
+        subject: 'Nouvelle inscription - Sauvetage Sportif',
+        template: 'NOTIFICATION_SAUVE_TAGE_SPORTIF',
+        data: {
+          inscription: {
+            firstname: body.firstname,
+            name: body.name,
+            email: body.email,
+            phone: body.phone,
+            birthdate: new Date(body.birthdate).toLocaleDateString('fr-FR'),
+            observation: body.observation,
+          },
+        },
+      });
+
+      return { message: 'Inscription envoyée avec succès à l\'admin' };
+    } catch (error) {
+      this.logger.error(`Erreur lors de l'envoi de l'inscription Sauvetage Sportif: ${error.message}`, error.stack);
+      throw new BadRequestException('Erreur lors de l\'envoi de l\'inscription');
     }
   }
 

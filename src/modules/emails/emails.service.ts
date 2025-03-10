@@ -1,3 +1,4 @@
+// src/modules/emails/emails.service.ts
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
@@ -27,49 +28,54 @@ export class EmailsService {
     this.transporter = nodemailer.createTransport({
       host: this.configService.get<string>('SMTP_HOST'),
       port: this.configService.get<number>('SMTP_PORT'),
-      secure: true,
+      secure: this.configService.get<boolean>('SMTP_SECURE', { infer: true }) || true,
       auth: {
         user: this.configService.get<string>('SMTP_USER'),
-        pass: this.configService.get<string>('SMTP_PASS')
-      }
+        pass: this.configService.get<string>('SMTP_PASS'),
+      },
     });
 
     // Créer le dossier des templates s'il n'existe pas
     if (!fs.existsSync(this.templatesDir)) {
       fs.mkdirSync(this.templatesDir, { recursive: true });
+      this.logger.log(`Dossier des templates créé : ${this.templatesDir}`);
     }
   }
 
   async sendEmail(options: SendEmailOptions): Promise<boolean> {
     try {
       let htmlContent: string;
+      let subject = options.subject;
 
-      // Mapper le type d'email au fichier de template
-      const templateMap = {
+      // Mapper les types d'email aux fichiers de template
+      const templateMap: { [key in EmailType | string]: string } = {
         'INSCRIPTION': 'inscription-recue.html',
         'INSCRIPTION_ACCEPTEE': 'inscription-acceptee.html',
         'INSCRIPTION_REFUSEE': 'inscription-refusee.html',
         'INSCRIPTION_ANNULEE': 'inscription-annulee.html',
         'NOTIFICATION': 'notification-admin.html',
+        'NOTIFICATION_SAUVE_TAGE_SPORTIF': 'notification-sauvetage-sportif.html', // Nouveau template
       };
 
-      // Si c'est un type d'email connu, chercher le template dans la base de données ou dans les fichiers
+      // Si le template est dans la liste des templates connus
       if (typeof options.template === 'string' && templateMap[options.template]) {
+        const templateFile = templateMap[options.template];
+        const templatePath = path.join(this.templatesDir, templateFile);
+
         try {
           // Essayer de lire le fichier template
-          const templatePath = path.join(this.templatesDir, templateMap[options.template]);
           const templateContent = fs.readFileSync(templatePath, 'utf8');
           const template = Handlebars.compile(templateContent);
           htmlContent = template(options.data || {});
         } catch (fileError) {
-          this.logger.warn(`Template file not found, falling back to database: ${fileError.message}`);
-          
-          // Si le fichier n'existe pas, chercher dans la base de données
+          this.logger.warn(`Template file ${templateFile} not found, falling back to database: ${fileError.message}`);
+
+          // Chercher dans la base de données si le fichier n'existe pas
           const emailTemplate = await this.prisma.emailTemplate.findFirst({
             where: {
               type: options.template as EmailType,
-              active: true
-            }
+              active: true,
+            },
           });
 
           if (!emailTemplate) {
@@ -78,24 +84,29 @@ export class EmailsService {
 
           const template = Handlebars.compile(emailTemplate.content);
           htmlContent = template(options.data || {});
-          options.subject = options.subject || emailTemplate.subject;
+          subject = subject || emailTemplate.subject;
         }
       } else {
-        // Sinon, considérer que le template est le contenu HTML
-        htmlContent = options.template;
+        // Si ce n'est pas un template connu, utiliser le contenu fourni directement
+        htmlContent = options.template as string;
+      }
+
+      // Vérifier que le destinataire est valide
+      if (!options.to || !options.to.includes('@')) {
+        throw new Error('Adresse email du destinataire invalide');
       }
 
       await this.transporter.sendMail({
-        from: this.configService.get<string>('SMTP_USER'),
+        from: this.configService.get<string>('SMTP_FROM') || this.configService.get<string>('SMTP_USER'),
         to: options.to,
-        subject: options.subject,
-        html: htmlContent
+        subject: subject,
+        html: htmlContent,
       });
 
-      this.logger.log(`Email sent to ${options.to}`);
+      this.logger.log(`Email envoyé avec succès à ${options.to} avec le sujet : ${subject}`);
       return true;
     } catch (error) {
-      this.logger.error(`Failed to send email: ${error.message}`, error.stack);
+      this.logger.error(`Échec de l'envoi de l'email : ${error.message}`, error.stack);
       return false;
     }
   }

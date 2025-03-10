@@ -3,20 +3,12 @@ import { Module } from '@nestjs/common';
 import { GalleryController } from './gallery.controller';
 import { GalleryService } from './gallery.service';
 import { MulterModule } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { extname } from 'path';
+import { memoryStorage } from 'multer'; // Importer memoryStorage
 
 @Module({
   imports: [
     MulterModule.register({
-      storage: diskStorage({
-        destination: './uploads/temp', // Stockage temporaire
-        filename: (req, file, callback) => {
-          const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-          const ext = extname(file.originalname);
-          callback(null, `${uniqueSuffix}${ext}`);
-        },
-      }),
+      storage: memoryStorage(), // Utiliser memoryStorage au lieu de diskStorage
       fileFilter: (req, file, callback) => {
         const allowedTypes = /jpg|jpeg|png|webp/;
         const isValid = allowedTypes.test(file.mimetype);
