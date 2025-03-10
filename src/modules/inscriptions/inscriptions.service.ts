@@ -118,6 +118,11 @@ export class InscriptionsService {
 
   async sendSauvetageSportifInscription(body: { firstname: string; name: string; email: string; phone: string; birthdate: string; observation: string }): Promise<{ message: string }> {
     try {
+      // Validation des données
+      if (!body.firstname || !body.name || !body.email || !body.phone || !body.birthdate) {
+        throw new BadRequestException('Tous les champs obligatoires (firstname, name, email, phone, birthdate) doivent être remplis');
+      }
+
       const adminEmail = process.env.ADMIN_EMAIL;
       if (!adminEmail) {
         throw new BadRequestException('Adresse email de l\'admin non configurée');
@@ -135,7 +140,7 @@ export class InscriptionsService {
             email: body.email,
             phone: body.phone,
             birthdate: new Date(body.birthdate).toLocaleDateString('fr-FR'),
-            observation: body.observation,
+            observation: body.observation || '',
           },
         },
       });
@@ -143,7 +148,7 @@ export class InscriptionsService {
       return { message: 'Inscription envoyée avec succès à l\'admin' };
     } catch (error) {
       this.logger.error(`Erreur lors de l'envoi de l'inscription Sauvetage Sportif: ${error.message}`, error.stack);
-      throw new BadRequestException('Erreur lors de l\'envoi de l\'inscription');
+      throw new BadRequestException(`Erreur lors de l'envoi de l'inscription: ${error.message}`);
     }
   }
 
