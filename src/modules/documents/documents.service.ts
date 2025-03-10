@@ -1,3 +1,4 @@
+// src/modules/documents/documents.service.ts
 import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateDocumentDto } from './dto/create-document.dto';
@@ -35,6 +36,11 @@ export class DocumentsService {
         throw new BadRequestException('Fichier trop volumineux (max: 10MB)');
       }
 
+      // Vérifier si le buffer est disponible
+      if (!file.buffer) {
+        throw new BadRequestException('Le fichier n\'a pas été correctement chargé en mémoire');
+      }
+
       // Créer un nom de fichier sécurisé
       const filename = `${Date.now()}-${file.originalname.replace(/[^a-zA-Z0-9.]/g, '-')}`;
       const filepath = path.join(this.uploadDirectory, filename);
@@ -56,7 +62,7 @@ export class DocumentsService {
       return document;
     } catch (error) {
       this.logger.error(`Erreur lors de la création du document : ${error.message}`, error.stack);
-      throw error;
+      throw new BadRequestException(`Erreur lors de la création du document : ${error.message}`);
     }
   }
 
@@ -165,14 +171,14 @@ export class DocumentsService {
   async getFileForDownload(id: string): Promise<{ buffer: Buffer; mimetype: string; filename: string }> {
     try {
       const document = await this.findOne(id);
-      
+
       // Incrémenter le compteur de téléchargements
       await this.incrementDownloadCount(id);
-      
+
       // Lire le fichier
       const filepath = path.join(this.uploadDirectory, document.filename);
       const buffer = await fs.readFile(filepath);
-      
+
       // Déterminer le type MIME
       const ext = path.extname(document.filename).toLowerCase();
       const mimeTypes: { [key: string]: string } = {
@@ -187,9 +193,9 @@ export class DocumentsService {
         '.gif': 'image/gif',
         '.txt': 'text/plain',
       };
-      
+
       const mimetype = mimeTypes[ext] || 'application/octet-stream';
-      
+
       return { buffer, mimetype, filename: document.filename };
     } catch (error) {
       this.logger.error(`Erreur lors de la récupération du fichier pour téléchargement : ${error.message}`, error.stack);

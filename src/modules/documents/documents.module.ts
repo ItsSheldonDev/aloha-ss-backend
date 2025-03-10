@@ -1,21 +1,14 @@
+// src/modules/documents/documents.module.ts
 import { Module } from '@nestjs/common';
 import { DocumentsController } from './documents.controller';
 import { DocumentsService } from './documents.service';
 import { MulterModule } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { extname } from 'path';
+import { memoryStorage } from 'multer';
 
 @Module({
   imports: [
     MulterModule.register({
-      storage: diskStorage({
-        destination: './public/uploads/documents',
-        filename: (req, file, callback) => {
-          const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-          const ext = extname(file.originalname);
-          callback(null, `${uniqueSuffix}${ext}`);
-        },
-      }),
+      storage: memoryStorage(), // Utilise memoryStorage pour garder le fichier en mémoire
       limits: {
         fileSize: 10 * 1024 * 1024, // 10 MB
       },

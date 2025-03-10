@@ -19,10 +19,13 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role, StatutInscription } from '@prisma/client';
+import { Logger } from '@nestjs/common';
 
 @ApiTags('inscriptions')
 @Controller('inscriptions')
 export class InscriptionsController {
+  private readonly logger = new Logger(InscriptionsController.name);
+
   constructor(private readonly inscriptionsService: InscriptionsService) {}
 
   @Post()
@@ -39,6 +42,7 @@ export class InscriptionsController {
   @ApiResponse({ status: 200, description: 'Inscription envoyée avec succès' })
   @ApiResponse({ status: 400, description: 'Données invalides' })
   async sendSauvetageSportifInscription(@Body() body: { firstname: string; name: string; email: string; phone: string; birthdate: string; observation: string }) {
+    this.logger.log(`Requête POST reçue pour /inscriptions/sauvetage-sportif avec body: ${JSON.stringify(body)}`);
     return this.inscriptionsService.sendSauvetageSportifInscription(body);
   }
 
