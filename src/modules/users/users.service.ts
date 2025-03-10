@@ -194,7 +194,7 @@ export class UsersService {
     }
   }
 
-  async getMe(userId: string): Promise<any> { // Modifié pour accepter userId au lieu de Request
+  async getMe(userId: string): Promise<any> {
     try {
       const user = await this.prisma.admin.findUnique({
         where: { id: userId },
@@ -205,8 +205,7 @@ export class UsersService {
           prenom: true,
           role: true,
           avatar: true,
-          createdAt: true, // Retenu comme champ valide
-          // Supprimé updatedAt car non défini dans le schéma Prisma
+          createdAt: true,
         },
       });
 

@@ -1613,7 +1613,22 @@
         ]
       }
     },
-    "/api/admin/settings": {
+    "/api/settings": {
+      "get": {
+        "operationId": "SettingsController_getPublicSettings",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Paramètres récupérés avec succès"
+          }
+        },
+        "summary": "Récupérer les paramètres publics du système",
+        "tags": [
+          "settings"
+        ]
+      }
+    },
+    "/api/settings/admin": {
       "get": {
         "operationId": "SettingsController_getSettings",
         "parameters": [],
@@ -1630,7 +1645,7 @@
             "bearer": []
           }
         ],
-        "summary": "Récupérer les paramètres du système",
+        "summary": "Récupérer les paramètres du système (admin)",
         "tags": [
           "settings"
         ]

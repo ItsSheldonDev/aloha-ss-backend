@@ -8,14 +8,21 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '@prisma/client';
 
 @ApiTags('settings')
-@Controller('admin/settings')
+@Controller({ path: 'settings', version: '1' })
 export class SettingsController {
   constructor(private readonly settingsService: SettingsService) {}
 
-  @UseGuards(JwtAuthGuard)
   @Get()
+  @ApiOperation({ summary: 'Récupérer les paramètres publics du système' })
+  @ApiResponse({ status: 200, description: 'Paramètres récupérés avec succès' })
+  getPublicSettings() {
+    return this.settingsService.getSettings();
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('admin')
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Récupérer les paramètres du système' })
+  @ApiOperation({ summary: 'Récupérer les paramètres du système (admin)' })
   @ApiResponse({ status: 200, description: 'Paramètres récupérés avec succès' })
   @ApiResponse({ status: 401, description: 'Non autorisé' })
   getSettings() {
@@ -24,7 +31,7 @@ export class SettingsController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN)
-  @Post()
+  @Post('admin')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Mettre à jour les paramètres du système (super admin uniquement)' })
   @ApiResponse({ status: 200, description: 'Paramètres mis à jour avec succès' })
