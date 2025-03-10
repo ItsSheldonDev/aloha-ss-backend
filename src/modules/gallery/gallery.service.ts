@@ -1,3 +1,4 @@
+// src/gallery/gallery.service.ts
 import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateImageDto } from './dto/create-image.dto';
@@ -17,7 +18,6 @@ export class GalleryService {
   private readonly maxWidth = 1920; // Largeur maximale pour les images
 
   constructor(private readonly prisma: PrismaService) {
-    // Créer le répertoire d'upload si nécessaire
     this.ensureUploadDirectory();
   }
 
@@ -34,6 +34,12 @@ export class GalleryService {
       if (!file) {
         throw new BadRequestException('Fichier image requis');
       }
+
+      if (!file.buffer || file.buffer.length === 0) {
+        throw new BadRequestException('Buffer du fichier image vide');
+      }
+
+      this.logger.log(`Fichier reçu : ${file.originalname}, taille=${file.size} bytes, mimetype=${file.mimetype}`);
 
       // Vérifier la taille du fichier
       if (file.size > this.maxFileSize) {
@@ -61,6 +67,7 @@ export class GalleryService {
         },
       });
 
+      this.logger.log(`Image créée avec succès : ${filename}`);
       return image;
     } catch (error) {
       this.logger.error(`Erreur lors de la création de l'image : ${error.message}`, error.stack);
@@ -74,16 +81,24 @@ export class GalleryService {
 
   private async compressAndSaveImage(buffer: Buffer, filepath: string): Promise<void> {
     try {
+      if (!buffer || buffer.length === 0) {
+        throw new BadRequestException('Buffer d\'image vide ou invalide');
+      }
+
+      this.logger.log(`Traitement de l'image : taille=${buffer.length} bytes`);
+
       // Utiliser sharp pour redimensionner et compresser
       const image = sharp(buffer);
       const metadata = await image.metadata();
-      
+
+      this.logger.log(`Métadonnées de l'image : format=${metadata.format}, width=${metadata.width}, height=${metadata.height}`);
+
       // Redimensionner seulement si l'image est plus large que maxWidth
       let processedImage = image;
       if (metadata.width && metadata.width > this.maxWidth) {
         processedImage = image.resize(this.maxWidth);
       }
-      
+
       // Déterminer le format de sortie et la compression
       const format = metadata.format;
       switch (format) {
@@ -98,12 +113,12 @@ export class GalleryService {
           await processedImage.webp({ quality: this.compressionQuality }).toFile(filepath);
           break;
         default:
-          // Si le format n'est pas reconnu, convertir en webp
+          this.logger.warn(`Format non supporté (${format}), conversion en webp`);
           await processedImage.webp({ quality: this.compressionQuality }).toFile(filepath);
       }
     } catch (error) {
       this.logger.error(`Erreur lors de la compression de l'image : ${error.message}`, error.stack);
-      throw error;
+      throw new BadRequestException(`Erreur lors de la compression de l'image : ${error.message}`);
     }
   }
 
@@ -140,7 +155,6 @@ export class GalleryService {
 
       // Mode "random" - renvoyer des images aléatoires
       if (mode === 'random') {
-        // Utiliser le SQL natif pour récupérer des images aléatoires
         const randomImages = await this.prisma.$queryRaw<Image[]>`
           SELECT id, filename, alt, category, "createdAt" 
           FROM "Image" 
@@ -197,10 +211,8 @@ export class GalleryService {
 
   async update(id: string, updateImageDto: UpdateImageDto): Promise<Image> {
     try {
-      // Vérifier si l'image existe
       await this.findOne(id);
 
-      // Mettre à jour l'image
       return await this.prisma.image.update({
         where: { id },
         data: updateImageDto,
@@ -213,19 +225,15 @@ export class GalleryService {
 
   async remove(id: string): Promise<void> {
     try {
-      // Récupérer l'image pour avoir le nom du fichier
       const image = await this.findOne(id);
 
-      // Supprimer le fichier
       const filepath = path.join(this.uploadDirectory, image.filename);
       try {
         await fs.unlink(filepath);
       } catch (error) {
         this.logger.warn(`Fichier non trouvé lors de la suppression : ${error.message}`);
-        // Continuer même si le fichier n'existe pas
       }
 
-      // Supprimer l'entrée de la base de données
       await this.prisma.image.delete({
         where: { id },
       });
