@@ -1,5 +1,6 @@
-# API Aloha Secourisme
+# API Aloha Secourisme   
 [![Better Stack Badge](https://uptime.betterstack.com/status-badges/v3/monitor/1tvdq.svg)](https://uptime.betterstack.com/?utm_source=status_badge)
+
 API REST complète pour la gestion de l'application Aloha Secourisme. Cette API permet de gérer les formations, les inscriptions, les documents, la galerie d'images, les actualités et l'administration du système.
 
 ## 📋 Table des matières
