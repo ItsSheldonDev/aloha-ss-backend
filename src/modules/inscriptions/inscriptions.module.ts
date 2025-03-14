@@ -1,3 +1,4 @@
+// src/modules/inscriptions/inscriptions.module.ts
 import { Module } from '@nestjs/common';
 import { InscriptionsController } from './inscriptions.controller';
 import { InscriptionsService } from './inscriptions.service';

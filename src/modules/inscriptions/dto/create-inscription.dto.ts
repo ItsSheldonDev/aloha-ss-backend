@@ -43,10 +43,10 @@ export class CreateInscriptionDto {
   dateNaissance: string;
 
   @ApiProperty({
-    example: 'abc123def456',
+    example: 'cm8378b1w0000ieen3bkkafwh',
     description: 'ID de la formation à laquelle le participant souhaite s\'inscrire',
   })
-  @IsUUID()
+  @IsString()
   @IsNotEmpty()
   formationId: string;
 

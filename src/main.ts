@@ -63,8 +63,8 @@ async function bootstrap() {
   // Configuration CORS détaillée
   app.enableCors({
     origin: process.env.NODE_ENV === 'development' 
-      ? 'http://localhost:3000' // Pour le développement local
-      : 'http://localhost:3000', // Remplace par ton domaine en production
+      ? 'http://localhost:4000' // Pour le développement local
+      : 'https://aloha-secourisme.fr', // Remplace par ton domaine en production
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     allowedHeaders: 'Authorization,Content-Type,Accept',
     credentials: true, // Autoriser les cookies/authentification si nécessaire

@@ -13,59 +13,55 @@ export class FormationsService {
     type?: TypeFormation,
     month?: string,
     status?: StatutFormation,
-    publicOnly: boolean = false
+    publicOnly: boolean = false,
   ): Promise<Formation[]> {
     let whereClause: any = {};
-    
+
     if (publicOnly) {
-      // Filtre pour les formations publiques (accessible sans authentification)
+      // Filtre pour les formations publiques : uniquement PLANIFIEE ou EN_COURS
       whereClause = {
         statut: {
-          in: ['PLANIFIEE', 'EN_COURS']
+          in: ['PLANIFIEE', 'EN_COURS'],
         },
-        date: {
-          gte: new Date()
-        }
       };
     }
-    
+
     if (type) {
       whereClause.type = type;
     }
-    
-    if (month) {
+
+    if (month && !publicOnly) { // Filtre month réservé aux admins
       const [year, monthNum] = month.split('-');
       const startDate = new Date(+year, +monthNum - 1, 1);
       const endDate = new Date(+year, +monthNum, 0);
-      
+
       whereClause.date = {
-        ...(whereClause.date || {}),
         gte: startDate,
-        lte: endDate
+        lte: endDate,
       };
     }
-    
-    if (status) {
+
+    if (status && !publicOnly) { // Filtre status réservé aux admins
       whereClause.statut = status;
     }
-    
+
     return this.prisma.formation.findMany({
       where: whereClause,
       orderBy: { date: 'asc' },
       include: {
         _count: {
-          select: { inscriptions: true }
-        }
-      }
+          select: { inscriptions: true },
+        },
+      },
     });
   }
 
-  async findOne(id: string): Promise<any> {
+  async findOne(id: string): Promise<Formation> {
     const formation = await this.prisma.formation.findUnique({
       where: { id },
       include: {
-        inscriptions: true
-      }
+        inscriptions: true,
+      },
     });
 
     if (!formation) {
@@ -81,8 +77,8 @@ export class FormationsService {
       data: {
         ...data,
         placesDisponibles: data.placesTotal,
-        statut: StatutFormation.PLANIFIEE
-      }
+        statut: StatutFormation.PLANIFIEE,
+      },
     });
   }
 
@@ -94,8 +90,8 @@ export class FormationsService {
       where: { id },
       data: {
         ...data,
-        updatedAt: new Date()
-      }
+        updatedAt: new Date(),
+      },
     });
   }
 
@@ -107,8 +103,8 @@ export class FormationsService {
       where: { id },
       data: {
         statut: data.statut,
-        updatedAt: new Date()
-      }
+        updatedAt: new Date(),
+      },
     });
   }
 
@@ -118,7 +114,7 @@ export class FormationsService {
 
     // Vérifier s'il y a des inscriptions associées
     const inscriptionCount = await this.prisma.inscription.count({
-      where: { formationId: id }
+      where: { formationId: id },
     });
 
     if (inscriptionCount > 0) {
@@ -126,7 +122,7 @@ export class FormationsService {
     }
 
     await this.prisma.formation.delete({
-      where: { id }
+      where: { id },
     });
   }
 }

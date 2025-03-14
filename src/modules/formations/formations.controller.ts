@@ -27,12 +27,8 @@ export class FormationsController {
   @Get()
   @ApiOperation({ summary: 'Récupérer toutes les formations disponibles (accès public)' })
   @ApiQuery({ name: 'type', enum: TypeFormation, required: false })
-  @ApiQuery({ name: 'month', example: '2023-12', required: false })
-  findAllPublic(
-    @Query('type') type?: TypeFormation,
-    @Query('month') month?: string,
-  ) {
-    return this.formationsService.findAll(type, month, undefined, true);
+  findAllPublic(@Query('type') type?: TypeFormation) {
+    return this.formationsService.findAll(type, undefined, undefined, true);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)

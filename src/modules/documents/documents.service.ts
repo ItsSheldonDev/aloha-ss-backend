@@ -137,9 +137,12 @@ export class DocumentsService {
     }
   }
 
-  async incrementDownloadCount(id: string): Promise<number> {
+  async getFileForDownload(id: string): Promise<{ buffer: Buffer; mimetype: string; filename: string }> {
     try {
-      const document = await this.prisma.document.update({
+      const document = await this.findOne(id);
+
+      // Incrémenter le compteur de téléchargements
+      const updatedDocument = await this.prisma.document.update({
         where: { id },
         data: {
           downloads: {
@@ -147,40 +150,16 @@ export class DocumentsService {
           },
         },
         select: {
-          downloads: true,
+          filename: true,
         },
       });
 
-      return document.downloads;
-    } catch (error) {
-      this.logger.error(`Erreur lors de l'incrémentation du compteur de téléchargements : ${error.message}`, error.stack);
-      throw error;
-    }
-  }
-
-  async getDownloadCount(id: string): Promise<number> {
-    try {
-      const document = await this.findOne(id);
-      return document.downloads;
-    } catch (error) {
-      this.logger.error(`Erreur lors de la récupération du compteur de téléchargements : ${error.message}`, error.stack);
-      throw error;
-    }
-  }
-
-  async getFileForDownload(id: string): Promise<{ buffer: Buffer; mimetype: string; filename: string }> {
-    try {
-      const document = await this.findOne(id);
-
-      // Incrémenter le compteur de téléchargements
-      await this.incrementDownloadCount(id);
-
       // Lire le fichier
-      const filepath = path.join(this.uploadDirectory, document.filename);
+      const filepath = path.join(this.uploadDirectory, updatedDocument.filename);
       const buffer = await fs.readFile(filepath);
 
       // Déterminer le type MIME
-      const ext = path.extname(document.filename).toLowerCase();
+      const ext = path.extname(updatedDocument.filename).toLowerCase();
       const mimeTypes: { [key: string]: string } = {
         '.pdf': 'application/pdf',
         '.doc': 'application/msword',
@@ -196,7 +175,7 @@ export class DocumentsService {
 
       const mimetype = mimeTypes[ext] || 'application/octet-stream';
 
-      return { buffer, mimetype, filename: document.filename };
+      return { buffer, mimetype, filename: updatedDocument.filename };
     } catch (error) {
       this.logger.error(`Erreur lors de la récupération du fichier pour téléchargement : ${error.message}`, error.stack);
       throw error;
