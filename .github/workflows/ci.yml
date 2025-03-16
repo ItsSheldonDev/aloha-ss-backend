@@ -55,7 +55,7 @@ jobs:
           NODE_ENV: test
 
       - name: Upload build artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2
         with:
           name: build
           path: dist/
