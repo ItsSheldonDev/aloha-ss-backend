@@ -1,3 +1,4 @@
+// src/modules/database/database.service.ts
 import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 
@@ -10,7 +11,7 @@ export class DatabaseService {
   async exportDatabase(): Promise<any> {
     try {
       // Récupérer toutes les données
-      const [admins, formations, inscriptions, settings, documents, images, news, emailTemplates] = await Promise.all([
+      const [admins, settings, documents, images, news, emailTemplates] = await Promise.all([
         this.prisma.admin.findMany({
           select: {
             id: true,
@@ -23,8 +24,6 @@ export class DatabaseService {
             // Ne pas inclure le mot de passe pour des raisons de sécurité
           },
         }),
-        this.prisma.formation.findMany(),
-        this.prisma.inscription.findMany(),
         this.prisma.setting.findMany(),
         this.prisma.document.findMany(),
         this.prisma.image.findMany(),
@@ -40,8 +39,6 @@ export class DatabaseService {
         },
         data: {
           admins,
-          formations,
-          inscriptions,
           settings,
           documents,
           images,
@@ -79,8 +76,6 @@ export class DatabaseService {
       // Transaction pour assurer l'intégrité des données
       await this.prisma.$transaction(async (tx) => {
         // Réinitialiser certaines tables (mais garder les administrateurs)
-        await tx.inscription.deleteMany();
-        await tx.formation.deleteMany();
         await tx.setting.deleteMany();
         await tx.document.deleteMany();
         await tx.image.deleteMany();
@@ -88,14 +83,6 @@ export class DatabaseService {
         await tx.emailTemplate.deleteMany();
 
         // Restaurer les données (sauf les admins pour la sécurité)
-        if (data.data.formations && data.data.formations.length > 0) {
-          await this.importFormations(tx, data.data.formations);
-        }
-
-        if (data.data.inscriptions && data.data.inscriptions.length > 0) {
-          await this.importInscriptions(tx, data.data.inscriptions);
-        }
-
         if (data.data.settings && data.data.settings.length > 0) {
           await this.importSettings(tx, data.data.settings);
         }
@@ -131,34 +118,6 @@ export class DatabaseService {
     } catch (error) {
       this.logger.error(`Erreur lors de l'import de la base de données : ${error.message}`, error.stack);
       throw error;
-    }
-  }
-
-  private async importFormations(tx: any, formations: any[]): Promise<void> {
-    for (const formation of formations) {
-      // Convertir les dates
-      await tx.formation.create({
-        data: {
-          ...formation,
-          date: new Date(formation.date),
-          createdAt: new Date(formation.createdAt),
-          updatedAt: new Date(formation.updatedAt),
-        },
-      });
-    }
-  }
-
-  private async importInscriptions(tx: any, inscriptions: any[]): Promise<void> {
-    for (const inscription of inscriptions) {
-      // Convertir les dates
-      await tx.inscription.create({
-        data: {
-          ...inscription,
-          dateNaissance: new Date(inscription.dateNaissance),
-          createdAt: new Date(inscription.createdAt),
-          updatedAt: new Date(inscription.updatedAt),
-        },
-      });
     }
   }
 
@@ -228,8 +187,6 @@ export class DatabaseService {
       // Transaction pour réinitialiser la base de données
       await this.prisma.$transaction(async (tx) => {
         // Supprimer toutes les données
-        await tx.inscription.deleteMany();
-        await tx.formation.deleteMany();
         await tx.setting.deleteMany();
         await tx.document.deleteMany();
         await tx.image.deleteMany();
@@ -262,10 +219,8 @@ export class DatabaseService {
 
   async getDatabaseStats(): Promise<any> {
     try {
-      const [admins, formations, inscriptions, documents, images, news, lastBackup] = await Promise.all([
+      const [admins, documents, images, news, lastBackup] = await Promise.all([
         this.prisma.admin.count(),
-        this.prisma.formation.count(),
-        this.prisma.inscription.count(),
         this.prisma.document.count(),
         this.prisma.image.count(),
         this.prisma.news.count(),
@@ -276,8 +231,6 @@ export class DatabaseService {
 
       return {
         admins,
-        formations,
-        inscriptions,
         documents,
         images,
         news,

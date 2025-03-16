@@ -1,3 +1,4 @@
+// src/modules/dashboard/dashboard.controller.ts
 import { Controller, Get, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { DashboardService } from './dashboard.service';
@@ -29,12 +30,12 @@ export class DashboardController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('inscription-trends')
+  @Get('formation-trends')
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Récupérer les tendances d\'inscription' })
+  @ApiOperation({ summary: 'Récupérer les tendances des formations' })
   @ApiResponse({ status: 200, description: 'Tendances récupérées avec succès' })
   @ApiResponse({ status: 401, description: 'Non autorisé' })
-  getInscriptionTrends() {
-    return this.dashboardService.getInscriptionTrends();
+  getFormationTrends() {
+    return this.dashboardService.getFormationTrends();
   }
 }
