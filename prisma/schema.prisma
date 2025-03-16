@@ -67,51 +67,12 @@ model EmailTemplate {
   updatedAt   DateTime    @updatedAt
 }
 
-model Formation {
-  id                String          @id @default(cuid())
-  titre            String
-  type             TypeFormation
-  date             DateTime
-  duree            String          // Format "7h", "35h" etc.
-  placesTotal      Int
-  placesDisponibles Int
-  prix             Float
-  lieu             String
-  formateur        String
-  statut           StatutFormation @default(PLANIFIEE)
-  inscriptions     Inscription[]
-  createdAt        DateTime        @default(now())
-  updatedAt        DateTime        @updatedAt
-
-  @@index([date])
-  @@index([type])
-  @@index([statut])
-}
-
-model Inscription {
-  id            String            @id @default(cuid())
-  formation     Formation         @relation(fields: [formationId], references: [id])
-  formationId   String
-  nom           String
-  prenom        String
-  email         String
-  telephone     String
-  dateNaissance DateTime
-  statut        StatutInscription @default(EN_ATTENTE)
-  message   String?
-  notifie       Boolean           @default(false)
-  createdAt     DateTime          @default(now())
-  updatedAt     DateTime          @updatedAt
-
-  @@index([formationId])
-  @@index([statut])
-  @@index([email])
-}
-
 enum EmailType {
-  INSCRIPTION
-  CONTACT
-  NOTIFICATION
+  NOTIFICATION_SAUVE_TAGE_SPORTIF
+  CONFIRMATION_CONTACT
+  NOTIFICATION_CONTACT
+  CONFIRMATION_SIGNALEMENT
+  NOTIFICATION_SIGNALEMENT
 }
 
 enum DocumentCategory {
@@ -129,28 +90,4 @@ enum Category {
 enum Role {
   ADMIN
   SUPER_ADMIN
-}
-
-enum TypeFormation {
-  PSC1
-  PSE1
-  PSE2
-  BNSSA
-  SSA
-  SST
-  BSB
-}
-
-enum StatutFormation {
-  PLANIFIEE
-  EN_COURS 
-  TERMINEE
-  ANNULEE
-}
-
-enum StatutInscription {
-  EN_ATTENTE
-  ACCEPTEE
-  REFUSEE
-  ANNULEE
 }

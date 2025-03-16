@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nouveau signalement</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: white;
+    }
+    .header {
+      background-color: #dc3545;
+      padding: 20px;
+      text-align: center;
+    }
+    .header h1 {
+      color: white;
+      margin: 10px 0;
+      font-size: 24px;
+    }
+    .content {
+      padding: 20px;
+    }
+    .message-box {
+      background-color: #f8f9fa;
+      border-radius: 5px;
+      padding: 15px;
+      margin-bottom: 20px;
+      white-space: pre-line;
+    }
+    .info-item {
+      margin-bottom: 10px;
+    }
+    .label {
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Nouveau signalement</h1>
+    </div>
+    <div class="content">
+      <p>Un nouveau signalement a été reçu :</p>
+      
+      <div class="info-item">
+        <span class="label">De :</span> {{signalement.name}} ({{signalement.email}})
+      </div>
+      <div class="info-item">
+        <span class="label">Type :</span> {{signalement.type}}
+      </div>
+      <div class="info-item">
+        <span class="label">Lieu :</span> {{signalement.location}}
+      </div>
+      <div class="info-item">
+        <span class="label">Date :</span> {{signalement.date}}
+      </div>
+      
+      <div class="info-item">
+        <span class="label">Détails :</span>
+      </div>
+      <div class="message-box">
+        {{signalement.details}}
+      </div>
+    </div>
+  </div>
+</body>
+</html>

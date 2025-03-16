@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Confirmation de votre signalement</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: white;
+    }
+    .header {
+      background-color: #dc3545;
+      padding: 20px;
+      text-align: center;
+    }
+    .header img {
+      max-width: 200px;
+      height: auto;
+    }
+    .header h1 {
+      color: white;
+      margin: 10px 0;
+      font-size: 24px;
+    }
+    .content {
+      padding: 20px;
+    }
+    .footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 12px;
+      color: #666;
+      background-color: #f4f4f4;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <img src="https://www.aloha-secourisme.fr/images/logo-white.png" alt="Aloha Secourisme">
+      <h1>Confirmation de votre signalement</h1>
+    </div>
+    <div class="content">
+      <p>Bonjour {{name}},</p>
+      
+      <p>Nous vous confirmons la bonne réception de votre signalement concernant "{{type}}".</p>
+      
+      <p>Notre équipe va traiter votre signalement dans les plus brefs délais. Selon la nature du signalement, nous pourrons être amenés à vous recontacter pour obtenir des informations complémentaires.</p>
+      
+      <p>Nous vous remercions de votre vigilance et de votre contribution à la sécurité de tous.</p>
+      
+      <p>Cordialement,<br>L'équipe Aloha Secourisme</p>
+    </div>
+    <div class="footer">
+      <p>Aloha Secourisme - Formation aux premiers secours<br>
+      123 Rue des Secouristes, 75000 Paris<br>
+      <a href="https://www.aloha-secourisme.fr">www.aloha-secourisme.fr</a></p>
+      <p>Cet email a été envoyé automatiquement, merci de ne pas y répondre.</p>
+    </div>
+  </div>
+</body>
+</html>

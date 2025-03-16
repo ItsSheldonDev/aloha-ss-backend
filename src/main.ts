@@ -113,7 +113,7 @@ async function bootstrap() {
     .setVersion('1.0.0')
     .setContact('Aloha Secourisme', 'https://www.aloha-secourisme.fr', 'contact@aloha-secourisme.fr')
     .setLicense('Propriétaire', 'https://www.aloha-secourisme.fr')
-    .addServer('http://localhost:3000', 'Serveur local')
+    .addServer('http://localhost:4000', 'Serveur local')
     .addServer('https://api.aloha-secourisme.fr', 'Serveur de production')
     .addBearerAuth(
       { 

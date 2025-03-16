@@ -3,188 +3,67 @@
   "paths": {
     "/api/formations": {
       "get": {
-        "operationId": "FormationsController_findAllPublic",
-        "parameters": [
-          {
-            "name": "type",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "enum": [
-                "PSC1",
-                "PSE1",
-                "PSE2",
-                "BNSSA",
-                "SSA",
-                "SST",
-                "BSB"
-              ],
-              "type": "string"
-            }
-          },
-          {
-            "name": "month",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "example": "2023-12",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "summary": "Récupérer toutes les formations disponibles (accès public)",
-        "tags": [
-          "formations"
-        ]
-      }
-    },
-    "/api/formations/admin": {
-      "get": {
         "operationId": "FormationsController_findAll",
         "parameters": [
           {
             "name": "type",
             "required": false,
             "in": "query",
+            "description": "Type de formation",
             "schema": {
-              "enum": [
-                "PSC1",
-                "PSE1",
-                "PSE2",
-                "BNSSA",
-                "SSA",
-                "SST",
-                "BSB"
-              ],
               "type": "string"
             }
           },
           {
-            "name": "month",
+            "name": "period",
             "required": false,
             "in": "query",
+            "description": "Période (all, 2024, 2025, recent)",
             "schema": {
-              "example": "2023-12",
-              "type": "string"
-            }
-          },
-          {
-            "name": "status",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "enum": [
-                "PLANIFIEE",
-                "EN_COURS",
-                "TERMINEE",
-                "ANNULEE"
-              ],
               "type": "string"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "Liste des formations récupérée avec succès"
           }
         },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Récupérer toutes les formations (admin)",
+        "summary": "Récupérer toutes les formations (accès public)",
         "tags": [
           "formations"
         ]
-      },
+      }
+    },
+    "/api/formations/upload": {
       "post": {
-        "operationId": "FormationsController_create",
+        "operationId": "FormationsController_uploadExcelFile",
         "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/CreateFormationDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Créer une nouvelle formation (admin)",
-        "tags": [
-          "formations"
-        ]
-      }
-    },
-    "/api/formations/admin/{id}": {
-      "get": {
-        "operationId": "FormationsController_findOne",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Récupérer une formation par son ID (admin)",
-        "tags": [
-          "formations"
-        ]
-      },
-      "put": {
-        "operationId": "FormationsController_update",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateFormationDto"
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": ""
+            "description": "Fichier Excel téléchargé avec succès"
+          },
+          "400": {
+            "description": "Données invalides ou fichier manquant"
+          },
+          "401": {
+            "description": "Non autorisé"
           }
         },
         "security": [
@@ -192,73 +71,7 @@
             "bearer": []
           }
         ],
-        "summary": "Mettre à jour une formation (admin)",
-        "tags": [
-          "formations"
-        ]
-      },
-      "delete": {
-        "operationId": "FormationsController_remove",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Supprimer une formation (admin)",
-        "tags": [
-          "formations"
-        ]
-      }
-    },
-    "/api/formations/admin/{id}/status": {
-      "put": {
-        "operationId": "FormationsController_updateStatus",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateFormationStatusDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Mettre à jour le statut d'une formation (admin)",
+        "summary": "Télécharger un nouveau fichier Excel des formations (admin)",
         "tags": [
           "formations"
         ]
@@ -523,249 +336,55 @@
         ]
       }
     },
-    "/api/inscriptions": {
+    "/api/inscriptions/sauvetage-sportif": {
       "post": {
-        "operationId": "InscriptionsController_create",
+        "operationId": "InscriptionsController_sendSauvetageSportifInscription",
         "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateInscriptionDto"
-              }
-            }
-          }
-        },
         "responses": {
-          "201": {
-            "description": "Inscription créée avec succès"
+          "200": {
+            "description": "Inscription envoyée avec succès"
           },
           "400": {
-            "description": "Données invalides ou plus de places disponibles"
-          },
-          "404": {
-            "description": "Formation non trouvée"
+            "description": "Données invalides"
           }
         },
-        "summary": "Créer une nouvelle inscription (accès public)",
+        "summary": "Envoyer une inscription pour Sauvetage Sportif (accès public)",
         "tags": [
           "inscriptions"
         ]
       }
     },
-    "/api/inscriptions/admin": {
-      "get": {
-        "operationId": "InscriptionsController_findAll",
-        "parameters": [
-          {
-            "name": "formationId",
-            "required": false,
-            "in": "query",
-            "description": "Filtrer par ID de formation",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "status",
-            "required": false,
-            "in": "query",
-            "description": "Filtrer par statut",
-            "schema": {
-              "enum": [
-                "EN_ATTENTE",
-                "ACCEPTEE",
-                "REFUSEE",
-                "ANNULEE"
-              ],
-              "type": "string"
-            }
-          },
-          {
-            "name": "search",
-            "required": false,
-            "in": "query",
-            "description": "Rechercher par nom, prénom ou email",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+    "/api/inscriptions/contact": {
+      "post": {
+        "operationId": "InscriptionsController_sendContactForm",
+        "parameters": [],
         "responses": {
           "200": {
-            "description": "Liste des inscriptions récupérée avec succès"
+            "description": "Message envoyé avec succès"
           },
-          "401": {
-            "description": "Non autorisé"
+          "400": {
+            "description": "Données invalides"
           }
         },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Récupérer toutes les inscriptions (admin)",
+        "summary": "Envoyer un message via le formulaire de contact (accès public)",
         "tags": [
           "inscriptions"
         ]
       }
     },
-    "/api/inscriptions/admin/{id}": {
-      "get": {
-        "operationId": "InscriptionsController_findOne",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "description": "ID de l'inscription",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+    "/api/inscriptions/signalement": {
+      "post": {
+        "operationId": "InscriptionsController_sendSignalement",
+        "parameters": [],
         "responses": {
           "200": {
-            "description": "Inscription récupérée avec succès"
+            "description": "Signalement envoyé avec succès"
           },
-          "401": {
-            "description": "Non autorisé"
-          },
-          "404": {
-            "description": "Inscription non trouvée"
+          "400": {
+            "description": "Données invalides"
           }
         },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Récupérer une inscription par son ID (admin)",
-        "tags": [
-          "inscriptions"
-        ]
-      },
-      "put": {
-        "operationId": "InscriptionsController_update",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "description": "ID de l'inscription",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateInscriptionDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Inscription mise à jour avec succès"
-          },
-          "401": {
-            "description": "Non autorisé"
-          },
-          "404": {
-            "description": "Inscription non trouvée"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Mettre à jour une inscription (admin)",
-        "tags": [
-          "inscriptions"
-        ]
-      },
-      "delete": {
-        "operationId": "InscriptionsController_remove",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "description": "ID de l'inscription",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Inscription supprimée avec succès"
-          },
-          "401": {
-            "description": "Non autorisé"
-          },
-          "404": {
-            "description": "Inscription non trouvée"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Supprimer une inscription (admin)",
-        "tags": [
-          "inscriptions"
-        ]
-      }
-    },
-    "/api/inscriptions/admin/{id}/status": {
-      "put": {
-        "operationId": "InscriptionsController_updateStatus",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "description": "ID de l'inscription",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateInscriptionStatusDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Statut mis à jour avec succès"
-          },
-          "401": {
-            "description": "Non autorisé"
-          },
-          "404": {
-            "description": "Inscription non trouvée"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Mettre à jour le statut d'une inscription (admin)",
+        "summary": "Envoyer un signalement (accès public)",
         "tags": [
           "inscriptions"
         ]
@@ -824,60 +443,6 @@
           }
         },
         "summary": "Télécharger un document (accès public)",
-        "tags": [
-          "documents"
-        ]
-      }
-    },
-    "/api/documents/{id}/count": {
-      "get": {
-        "operationId": "DocumentsController_getDownloadCount",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "description": "ID du document",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Nombre de téléchargements récupéré avec succès"
-          },
-          "404": {
-            "description": "Document non trouvé"
-          }
-        },
-        "summary": "Récupérer le nombre de téléchargements d'un document (accès public)",
-        "tags": [
-          "documents"
-        ]
-      },
-      "post": {
-        "operationId": "DocumentsController_incrementDownloadCount",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "description": "ID du document",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Compteur incrémenté avec succès"
-          },
-          "404": {
-            "description": "Document non trouvé"
-          }
-        },
-        "summary": "Incrémenter le compteur de téléchargements (accès public)",
         "tags": [
           "documents"
         ]
@@ -1910,7 +1475,7 @@
   "tags": [],
   "servers": [
     {
-      "url": "http://localhost:3000",
+      "url": "http://localhost:4000",
       "description": "Serveur local"
     },
     {
@@ -1928,145 +1493,6 @@
       }
     },
     "schemas": {
-      "CreateFormationDto": {
-        "type": "object",
-        "properties": {
-          "titre": {
-            "type": "string",
-            "example": "Formation PSC1",
-            "description": "Titre de la formation"
-          },
-          "type": {
-            "type": "string",
-            "enum": [
-              "PSC1",
-              "PSE1",
-              "PSE2",
-              "BNSSA",
-              "SSA",
-              "SST",
-              "BSB"
-            ],
-            "description": "Type de formation",
-            "example": "PSC1"
-          },
-          "date": {
-            "format": "date-time",
-            "type": "string",
-            "example": "2023-12-01T09:00:00Z",
-            "description": "Date de la formation"
-          },
-          "duree": {
-            "type": "string",
-            "example": "7h",
-            "description": "Durée de la formation"
-          },
-          "placesTotal": {
-            "type": "number",
-            "example": 12,
-            "description": "Nombre total de places"
-          },
-          "prix": {
-            "type": "number",
-            "example": 89.99,
-            "description": "Prix de la formation"
-          },
-          "lieu": {
-            "type": "string",
-            "example": "Lyon",
-            "description": "Lieu de la formation"
-          },
-          "formateur": {
-            "type": "string",
-            "example": "Jean Dupont",
-            "description": "Nom du formateur"
-          }
-        },
-        "required": [
-          "titre",
-          "type",
-          "date",
-          "duree",
-          "placesTotal",
-          "prix",
-          "lieu",
-          "formateur"
-        ]
-      },
-      "UpdateFormationDto": {
-        "type": "object",
-        "properties": {
-          "titre": {
-            "type": "string",
-            "example": "Formation PSC1",
-            "description": "Titre de la formation"
-          },
-          "type": {
-            "type": "string",
-            "enum": [
-              "PSC1",
-              "PSE1",
-              "PSE2",
-              "BNSSA",
-              "SSA",
-              "SST",
-              "BSB"
-            ],
-            "description": "Type de formation",
-            "example": "PSC1"
-          },
-          "date": {
-            "format": "date-time",
-            "type": "string",
-            "example": "2023-12-01T09:00:00Z",
-            "description": "Date de la formation"
-          },
-          "duree": {
-            "type": "string",
-            "example": "7h",
-            "description": "Durée de la formation"
-          },
-          "placesTotal": {
-            "type": "number",
-            "example": 12,
-            "description": "Nombre total de places"
-          },
-          "prix": {
-            "type": "number",
-            "example": 89.99,
-            "description": "Prix de la formation"
-          },
-          "lieu": {
-            "type": "string",
-            "example": "Lyon",
-            "description": "Lieu de la formation"
-          },
-          "formateur": {
-            "type": "string",
-            "example": "Jean Dupont",
-            "description": "Nom du formateur"
-          }
-        }
-      },
-      "UpdateFormationStatusDto": {
-        "type": "object",
-        "properties": {
-          "statut": {
-            "type": "string",
-            "enum": [
-              "PLANIFIEE",
-              "EN_COURS",
-              "TERMINEE",
-              "ANNULEE"
-            ],
-            "description": "Statut de la formation",
-            "example": "EN_COURS"
-          }
-        },
-        "required": [
-          "statut"
-        ]
-      },
       "CreateNewsDto": {
         "type": "object",
         "properties": {
@@ -2141,123 +1567,6 @@
         "required": [
           "email",
           "password"
-        ]
-      },
-      "CreateInscriptionDto": {
-        "type": "object",
-        "properties": {
-          "nom": {
-            "type": "string",
-            "example": "Dupont",
-            "description": "Nom de famille du participant"
-          },
-          "prenom": {
-            "type": "string",
-            "example": "Jean",
-            "description": "Prénom du participant"
-          },
-          "email": {
-            "type": "string",
-            "example": "jean.dupont@example.com",
-            "description": "Email du participant"
-          },
-          "telephone": {
-            "type": "string",
-            "example": "0612345678",
-            "description": "Numéro de téléphone du participant"
-          },
-          "dateNaissance": {
-            "type": "string",
-            "example": "1990-01-15",
-            "description": "Date de naissance du participant (format ISO)"
-          },
-          "formationId": {
-            "type": "string",
-            "example": "abc123def456",
-            "description": "ID de la formation à laquelle le participant souhaite s'inscrire"
-          },
-          "message": {
-            "type": "string",
-            "example": "Allergie aux arachides, besoin d'un accès PMR",
-            "description": "Message ou informations complémentaires"
-          }
-        },
-        "required": [
-          "nom",
-          "prenom",
-          "email",
-          "telephone",
-          "dateNaissance",
-          "formationId"
-        ]
-      },
-      "UpdateInscriptionDto": {
-        "type": "object",
-        "properties": {
-          "nom": {
-            "type": "string",
-            "example": "Dupont",
-            "description": "Nom de famille du participant"
-          },
-          "prenom": {
-            "type": "string",
-            "example": "Jean",
-            "description": "Prénom du participant"
-          },
-          "email": {
-            "type": "string",
-            "example": "jean.dupont@example.com",
-            "description": "Email du participant"
-          },
-          "telephone": {
-            "type": "string",
-            "example": "0612345678",
-            "description": "Numéro de téléphone du participant"
-          },
-          "dateNaissance": {
-            "type": "string",
-            "example": "1990-01-15",
-            "description": "Date de naissance du participant (format ISO)"
-          },
-          "message": {
-            "type": "string",
-            "example": "Allergie aux arachides, besoin d'un accès PMR",
-            "description": "Message ou informations complémentaires"
-          },
-          "statut": {
-            "type": "string",
-            "enum": [
-              "EN_ATTENTE",
-              "ACCEPTEE",
-              "REFUSEE",
-              "ANNULEE"
-            ],
-            "description": "Statut de l'inscription"
-          },
-          "notifie": {
-            "type": "boolean",
-            "example": false,
-            "description": "Indique si l'utilisateur a été notifié"
-          }
-        }
-      },
-      "UpdateInscriptionStatusDto": {
-        "type": "object",
-        "properties": {
-          "statut": {
-            "type": "string",
-            "enum": [
-              "EN_ATTENTE",
-              "ACCEPTEE",
-              "REFUSEE",
-              "ANNULEE"
-            ],
-            "description": "Nouveau statut de l'inscription",
-            "example": "ACCEPTEE"
-          }
-        },
-        "required": [
-          "statut"
         ]
       },
       "UpdateDocumentDto": {

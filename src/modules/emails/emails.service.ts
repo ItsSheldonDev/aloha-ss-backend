@@ -38,7 +38,7 @@ export class EmailsService {
     // Créer le dossier des templates s'il n'existe pas
     if (!fs.existsSync(this.templatesDir)) {
       fs.mkdirSync(this.templatesDir, { recursive: true });
-      this.logger.log(`Dossier des templates créé : ${this.templatesDir}`);
+      this.logger.log(`Dossier des templates créé ou déjà existant : ${this.templatesDir}`);
     }
   }
 
@@ -49,12 +49,11 @@ export class EmailsService {
 
       // Mapper les types d'email aux fichiers de template
       const templateMap: { [key in EmailType | string]: string } = {
-        'INSCRIPTION': 'inscription-recue.html',
-        'INSCRIPTION_ACCEPTEE': 'inscription-acceptee.html',
-        'INSCRIPTION_REFUSEE': 'inscription-refusee.html',
-        'INSCRIPTION_ANNULEE': 'inscription-annulee.html',
-        'NOTIFICATION': 'notification-admin.html',
-        'NOTIFICATION_SAUVE_TAGE_SPORTIF': 'notification-sauvetage-sportif.html', // Nouveau template
+        'NOTIFICATION_SAUVE_TAGE_SPORTIF': 'notification-sauvetage-sportif.html',
+        'CONFIRMATION_CONTACT': 'confirmation-contact.html',
+        'NOTIFICATION_CONTACT': 'notification-contact.html',
+        'CONFIRMATION_SIGNALEMENT': 'confirmation-signalement.html',
+        'NOTIFICATION_SIGNALEMENT': 'notification-signalement.html',
       };
 
       // Si le template est dans la liste des templates connus

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nouveau message de contact</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: white;
+    }
+    .header {
+      background-color: #0e5399;
+      padding: 20px;
+      text-align: center;
+    }
+    .header h1 {
+      color: white;
+      margin: 10px 0;
+      font-size: 24px;
+    }
+    .content {
+      padding: 20px;
+    }
+    .message-box {
+      background-color: #f8f9fa;
+      border-radius: 5px;
+      padding: 15px;
+      margin-bottom: 20px;
+      white-space: pre-line;
+    }
+    .info-item {
+      margin-bottom: 10px;
+    }
+    .label {
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Nouveau message de contact</h1>
+    </div>
+    <div class="content">
+      <p>Un nouveau message a été reçu via le formulaire de contact :</p>
+      
+      <div class="info-item">
+        <span class="label">De :</span> {{contact.name}} ({{contact.email}})
+      </div>
+      <div class="info-item">
+        <span class="label">Sujet :</span> {{contact.subject}}
+      </div>
+      <div class="info-item">
+        <span class="label">Date :</span> {{contact.date}}
+      </div>
+      
+      <div class="info-item">
+        <span class="label">Message :</span>
+      </div>
+      <div class="message-box">
+        {{contact.message}}
+      </div>
+    </div>
+  </div>
+</body>
+</html>

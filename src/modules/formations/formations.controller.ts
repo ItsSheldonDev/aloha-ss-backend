@@ -1,100 +1,70 @@
+// src/modules/formations/formations.controller.ts
 import {
   Controller,
   Get,
   Post,
-  Body,
-  Param,
-  Delete,
-  Put,
   Query,
   UseGuards,
+  UseInterceptors,
+  UploadedFile,
+  BadRequestException,
+  Logger
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
-import { FormationsService } from './formations.service';
-import { CreateFormationDto } from './dto/create-formation.dto';
-import { UpdateFormationDto } from './dto/update-formation.dto';
-import { UpdateFormationStatusDto } from './dto/update-formation-status.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery, ApiConsumes, ApiBody } from '@nestjs/swagger';
+import { FormationsService, FormattedFormation } from './formations.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { TypeFormation, StatutFormation, Role } from '@prisma/client';
-import { Roles } from '../auth/decorators/roles.decorator';
 import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { Role } from '@prisma/client';
 
 @ApiTags('formations')
 @Controller('formations')
 export class FormationsController {
+  private readonly logger = new Logger(FormationsController.name);
+
   constructor(private readonly formationsService: FormationsService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Récupérer toutes les formations disponibles (accès public)' })
-  @ApiQuery({ name: 'type', enum: TypeFormation, required: false })
-  findAllPublic(@Query('type') type?: TypeFormation) {
-    return this.formationsService.findAll(type, undefined, undefined, true);
-  }
-
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN, Role.SUPER_ADMIN)
-  @Get('admin')
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Récupérer toutes les formations (admin)' })
-  @ApiQuery({ name: 'type', enum: TypeFormation, required: false })
-  @ApiQuery({ name: 'month', example: '2023-12', required: false })
-  @ApiQuery({ name: 'status', enum: StatutFormation, required: false })
+  @ApiOperation({ summary: 'Récupérer toutes les formations (accès public)' })
+  @ApiQuery({ name: 'type', required: false, description: 'Type de formation' })
+  @ApiQuery({ name: 'period', required: false, description: 'Période (all, 2024, 2025, recent)' })
+  @ApiResponse({ status: 200, description: 'Liste des formations récupérée avec succès' })
   findAll(
-    @Query('type') type?: TypeFormation,
-    @Query('month') month?: string,
-    @Query('status') status?: StatutFormation,
-  ) {
-    return this.formationsService.findAll(type, month, status);
+    @Query('type') type?: string,
+    @Query('period') period?: string,
+  ): Promise<FormattedFormation[]> {
+    return this.formationsService.findAll(type, period);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
-  @Get('admin/:id')
+  @Post('upload')
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Récupérer une formation par son ID (admin)' })
-  findOne(@Param('id') id: string) {
-    return this.formationsService.findOne(id);
-  }
-
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN, Role.SUPER_ADMIN)
-  @Post('admin')
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Créer une nouvelle formation (admin)' })
-  create(@Body() createFormationDto: CreateFormationDto) {
-    return this.formationsService.create(createFormationDto);
-  }
-
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN, Role.SUPER_ADMIN)
-  @Put('admin/:id')
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Mettre à jour une formation (admin)' })
-  update(
-    @Param('id') id: string,
-    @Body() updateFormationDto: UpdateFormationDto,
-  ) {
-    return this.formationsService.update(id, updateFormationDto);
-  }
-
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN, Role.SUPER_ADMIN)
-  @Put('admin/:id/status')
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Mettre à jour le statut d\'une formation (admin)' })
-  updateStatus(
-    @Param('id') id: string,
-    @Body() updateStatusDto: UpdateFormationStatusDto,
-  ) {
-    return this.formationsService.updateStatus(id, updateStatusDto);
-  }
-
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN, Role.SUPER_ADMIN)
-  @Delete('admin/:id')
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Supprimer une formation (admin)' })
-  remove(@Param('id') id: string) {
-    return this.formationsService.remove(id);
+  @ApiOperation({ summary: 'Télécharger un nouveau fichier Excel des formations (admin)' })
+  @ApiResponse({ status: 200, description: 'Fichier Excel téléchargé avec succès' })
+  @ApiResponse({ status: 400, description: 'Données invalides ou fichier manquant' })
+  @ApiResponse({ status: 401, description: 'Non autorisé' })
+  async uploadExcelFile(@UploadedFile() file: Express.Multer.File) {
+    if (!file) {
+      this.logger.warn('Aucun fichier fourni dans la requête');
+      throw new BadRequestException('Aucun fichier fourni');
+    }
+    
+    this.logger.log(`Fichier reçu: ${file.originalname}, taille: ${file.size} octets, type: ${file.mimetype}`);
+    return this.formationsService.uploadExcelFile(file);
   }
 }
