@@ -1,202 +1,96 @@
+// src/modules/dashboard/dashboard.service.ts
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import { FormationsService } from '../formations/formations.service';
 
 @Injectable()
 export class DashboardService {
   private readonly logger = new Logger(DashboardService.name);
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly formationsService: FormationsService
+  ) {}
 
   async getStats(): Promise<any> {
     try {
-      const now = new Date();
-      const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      const startOfYesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
-      const startOfWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay());
-      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-      const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-      const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+      // Récupérer les formations depuis le service formations (fichier Excel)
+      const formations = await this.formationsService.findAll();
 
       // Récupérer les statistiques principales
       const [
-        totalFormations,
-        activeFormations,
-        cancelledFormations,
-        totalInscriptions,
-        acceptedInscriptions,
-        pendingInscriptions,
-        refusedInscriptions,
-        todayInscriptions,
-        weekInscriptions,
-        monthInscriptions,
-        lastMonthInscriptions,
-        totalUsers,
+        totalAdmins,
         totalDocuments,
         totalDownloads,
         totalImages,
+        totalNews
       ] = await Promise.all([
-        // Formations
-        this.prisma.formation.count(),
-        this.prisma.formation.count({
-          where: {
-            statut: {
-              in: ['PLANIFIEE', 'EN_COURS'],
-            },
-          },
-        }),
-        this.prisma.formation.count({
-          where: {
-            statut: 'ANNULEE',
-          },
-        }),
-
-        // Inscriptions
-        this.prisma.inscription.count(),
-        this.prisma.inscription.count({
-          where: {
-            statut: 'ACCEPTEE',
-          },
-        }),
-        this.prisma.inscription.count({
-          where: {
-            statut: 'EN_ATTENTE',
-          },
-        }),
-        this.prisma.inscription.count({
-          where: {
-            statut: 'REFUSEE',
-          },
-        }),
-        this.prisma.inscription.count({
-          where: {
-            createdAt: {
-              gte: startOfToday,
-            },
-          },
-        }),
-        this.prisma.inscription.count({
-          where: {
-            createdAt: {
-              gte: startOfWeek,
-            },
-          },
-        }),
-        this.prisma.inscription.count({
-          where: {
-            createdAt: {
-              gte: startOfMonth,
-            },
-          },
-        }),
-        this.prisma.inscription.count({
-          where: {
-            createdAt: {
-              gte: startOfLastMonth,
-              lt: startOfMonth,
-            },
-          },
-        }),
-
-        // Utilisateurs, documents et images
+        // Administrateurs
         this.prisma.admin.count(),
+
+        // Documents
         this.prisma.document.count(),
+
+        // Téléchargements
         this.prisma.document.aggregate({
           _sum: {
             downloads: true,
           },
         }),
+
+        // Images
         this.prisma.image.count(),
+
+        // Actualités
+        this.prisma.news.count({
+          where: {
+            published: true,
+          },
+        }),
       ]);
 
-      // Récupérer les inscriptions récentes
-      const recentInscriptions = await this.prisma.inscription.findMany({
-        take: 5,
-        orderBy: {
-          createdAt: 'desc',
-        },
-        include: {
-          formation: {
-            select: {
-              titre: true,
-              type: true,
-              date: true,
-            },
-          },
-        },
-      });
+      // Calculer les statistiques des formations
+      const activeFormations = formations.filter(f => 
+        f.statut === 'PLANIFIEE' || f.statut === 'EN_COURS'
+      );
+
+      // Récupérer les formations à venir
+      const upcomingFormations = formations
+        .filter(f => {
+          // Filtre formations futures, triées par date
+          const now = new Date();
+          return f.dateDebut > now && (f.statut === 'PLANIFIEE' || f.statut === 'EN_COURS');
+        })
+        .sort((a, b) => a.dateDebut.getTime() - b.dateDebut.getTime())
+        .slice(0, 5); // Limiter à 5 formations
 
       // Statistiques par type de formation
-      const formationsByType = await this.prisma.formation.groupBy({
-        by: ['type'],
-        _count: {
-          id: true,
-        },
-      });
-
-      // Inscriptions par mois (12 derniers mois)
-      const inscriptionsByMonth = await this.getInscriptionsByMonth();
-
-      // Taux d'occupation des formations
-      const occupationRate = await this.getOccupationRate();
-
-      // Obtenir les formations à venir
-      const upcomingFormations = await this.prisma.formation.findMany({
-        where: {
-          date: {
-            gte: new Date(),
-          },
-          statut: {
-            in: ['PLANIFIEE', 'EN_COURS'],
-          },
-        },
-        orderBy: {
-          date: 'asc',
-        },
-        take: 5,
-        include: {
-          _count: {
-            select: { inscriptions: true },
-          },
-        },
-      });
-
-      // Obtenir la répartition des statuts d'inscription
-      const inscriptionStatusDistribution = [
-        { status: 'ACCEPTEE', count: acceptedInscriptions },
-        { status: 'EN_ATTENTE', count: pendingInscriptions },
-        { status: 'REFUSEE', count: refusedInscriptions },
-      ];
+      const formationsByType = this.getFormationsByType(formations);
 
       // Assembler les statistiques complètes
       return {
         overview: {
-          totalFormations,
-          activeFormations,
-          cancelledFormations,
-          totalInscriptions,
-          acceptedInscriptions,
-          pendingInscriptions,
-          totalUsers,
+          totalFormations: formations.length,
+          activeFormations: activeFormations.length,
+          totalAdmins,
           totalDocuments,
           totalDownloads: totalDownloads._sum.downloads || 0,
           totalImages,
+          totalNews,
         },
         comparison: {
-          inscriptionsToday: todayInscriptions,
-          inscriptionsThisWeek: weekInscriptions,
-          inscriptionsThisMonth: monthInscriptions,
-          inscriptionsLastMonth: lastMonthInscriptions,
-          monthlyGrowth: this.calculateGrowthRate(monthInscriptions, lastMonthInscriptions),
+          formationsThisMonth: this.getFormationsInCurrentMonth(formations).length,
+          formationsLastMonth: this.getFormationsInLastMonth(formations).length,
+          formationsThisYear: this.getFormationsInCurrentYear(formations).length,
+          formationsLastYear: this.getFormationsInLastYear(formations).length,
         },
         recentActivity: {
-          recentInscriptions,
           upcomingFormations,
         },
         charts: {
           formationsByType,
-          inscriptionsByMonth,
-          occupationRate,
-          inscriptionStatusDistribution,
+          formationsByMonth: this.getFormationsByMonth(formations),
+          categoriesDistribution: await this.getCategoriesDistribution(),
         },
       };
     } catch (error) {
@@ -205,83 +99,123 @@ export class DashboardService {
     }
   }
 
-  private calculateGrowthRate(current: number, previous: number): number {
-    if (previous === 0) return current > 0 ? 100 : 0;
-    return Number((((current - previous) / previous) * 100).toFixed(2));
+  private getFormationsByType(formations: any[]): any[] {
+    const typeCount: Record<string, number> = {};
+    
+    formations.forEach(formation => {
+      const type = formation.type;
+      typeCount[type] = (typeCount[type] || 0) + 1;
+    });
+    
+    return Object.entries(typeCount).map(([type, count]) => ({
+      type,
+      count
+    }));
   }
 
-  private async getInscriptionsByMonth(): Promise<any[]> {
-    // Récupérer les données pour les 12 derniers mois
+  private getFormationsInCurrentMonth(formations: any[]): any[] {
     const now = new Date();
-    // Définir explicitement le type pour months
-    const months: { start: Date; end: Date }[] = [];
-    const result = [];
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+    
+    return formations.filter(formation => {
+      const date = new Date(formation.dateDebut);
+      return date >= startOfMonth && date <= endOfMonth;
+    });
+  }
+
+  private getFormationsInLastMonth(formations: any[]): any[] {
+    const now = new Date();
+    const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59);
+    
+    return formations.filter(formation => {
+      const date = new Date(formation.dateDebut);
+      return date >= startOfLastMonth && date <= endOfLastMonth;
+    });
+  }
+
+  private getFormationsInCurrentYear(formations: any[]): any[] {
+    const year = new Date().getFullYear();
+    
+    return formations.filter(formation => {
+      const date = new Date(formation.dateDebut);
+      return date.getFullYear() === year;
+    });
+  }
+
+  private getFormationsInLastYear(formations: any[]): any[] {
+    const lastYear = new Date().getFullYear() - 1;
+    
+    return formations.filter(formation => {
+      const date = new Date(formation.dateDebut);
+      return date.getFullYear() === lastYear;
+    });
+  }
+
+  private getFormationsByMonth(formations: any[]): any[] {
+    const now = new Date();
+    const months: { start: Date; end: Date; name: string }[] = [];
+    const result: Array<{ month: string; count: number }> = [];
   
+    // Créer les plages de dates pour les 12 derniers mois
     for (let i = 11; i >= 0; i--) {
       const month = new Date(now.getFullYear(), now.getMonth() - i, 1);
       const monthEnd = new Date(now.getFullYear(), now.getMonth() - i + 1, 0);
-      months.push({ start: month, end: monthEnd });
+      const monthName = month.toLocaleDateString('fr-FR', { month: 'short' });
+      months.push({ start: month, end: monthEnd, name: monthName });
     }
   
-    // Récupérer les données en parallèle
-    const promises = months.map(async ({ start, end }) => {
-      const count = await this.prisma.inscription.count({
-        where: {
-          createdAt: {
-            gte: start,
-            lte: end,
-          },
-        },
-      });
+    // Compter les formations par mois
+    months.forEach(({ start, end, name }) => {
+      const count = formations.filter(formation => {
+        const date = new Date(formation.dateDebut);
+        return date >= start && date <= end;
+      }).length;
   
-      return {
-        month: `${start.getFullYear()}-${(start.getMonth() + 1).toString().padStart(2, '0')}`,
+      result.push({
+        month: name,
         count,
-      };
+      });
     });
   
-    return Promise.all(promises);
+    return result;
   }
 
-  private async getOccupationRate(): Promise<any[]> {
-    // Récupérer les formations actives
-    const activeFormations = await this.prisma.formation.findMany({
-      where: {
-        statut: {
-          in: ['PLANIFIEE', 'EN_COURS'],
+  private async getCategoriesDistribution(): Promise<any[]> {
+    // Compter les éléments par catégorie
+    const [
+      documentCategories,
+      imageCategories
+    ] = await Promise.all([
+      // Distribution des catégories de documents
+      this.prisma.document.groupBy({
+        by: ['category'],
+        _count: {
+          id: true,
         },
-        date: {
-          gte: new Date(),
+      }),
+      
+      // Distribution des catégories d'images
+      this.prisma.image.groupBy({
+        by: ['category'],
+        _count: {
+          id: true,
         },
-      },
-      select: {
-        id: true,
-        titre: true,
-        type: true,
-        date: true,
-        placesTotal: true,
-        placesDisponibles: true,
-      },
-    });
+      }),
+    ]);
 
-    // Calculer le taux d'occupation pour chaque formation
-    return activeFormations.map((formation) => {
-      const occupied = formation.placesTotal - formation.placesDisponibles;
-      const occupationRate = (occupied / formation.placesTotal) * 100;
-
-      return {
-        id: formation.id,
-        titre: formation.titre,
-        type: formation.type,
-        date: formation.date,
-        places: {
-          total: formation.placesTotal,
-          occupied,
-          available: formation.placesDisponibles,
-        },
-        occupationRate: Math.round(occupationRate),
-      };
-    });
+    // Formater les résultats
+    return [
+      ...documentCategories.map(item => ({
+        category: `Document - ${item.category}`,
+        count: item._count.id,
+      })),
+      ...imageCategories.map(item => ({
+        category: `Image - ${item.category}`,
+        count: item._count.id,
+      })),
+    ];
   }
 
   async getYearlyStats(): Promise<any> {
@@ -289,38 +223,27 @@ export class DashboardService {
       const currentYear = new Date().getFullYear();
       const years = [currentYear - 2, currentYear - 1, currentYear];
       
+      // Récupérer les formations
+      const allFormations = await this.formationsService.findAll();
+      
       // Récupérer les données pour les 3 dernières années
-      const yearlyData = await Promise.all(
-        years.map(async (year) => {
-          const startOfYear = new Date(year, 0, 1);
-          const endOfYear = new Date(year, 11, 31, 23, 59, 59);
-          
-          const [inscriptions, formations] = await Promise.all([
-            this.prisma.inscription.count({
-              where: {
-                createdAt: {
-                  gte: startOfYear,
-                  lte: endOfYear,
-                },
-              },
-            }),
-            this.prisma.formation.count({
-              where: {
-                date: {
-                  gte: startOfYear,
-                  lte: endOfYear,
-                },
-              },
-            }),
-          ]);
-          
-          return {
-            year,
-            inscriptions,
-            formations,
-          };
-        })
-      );
+      const yearlyData = years.map(year => {
+        const startOfYear = new Date(year, 0, 1);
+        const endOfYear = new Date(year, 11, 31, 23, 59, 59);
+        
+        const formations = allFormations.filter(f => {
+          const date = new Date(f.dateDebut);
+          return date >= startOfYear && date <= endOfYear;
+        });
+        
+        return {
+          year,
+          formations: formations.length,
+          documents: 0,  // À calculer si nécessaire
+          images: 0,     // À calculer si nécessaire
+          news: 0,       // À calculer si nécessaire
+        };
+      });
       
       return yearlyData;
     } catch (error) {
@@ -329,51 +252,61 @@ export class DashboardService {
     }
   }
 
-  async getInscriptionTrends(): Promise<any> {
+  async getFormationTrends(): Promise<any> {
     try {
-      // Récupérer les données pour chaque type de formation
-      const inscriptionsByTypeRaw: Array<{ type: string; count: bigint }> = await this.prisma.$queryRaw`
-        SELECT f."type", COUNT(i.id) as count
-        FROM "Inscription" i
-        JOIN "Formation" f ON i."formationId" = f.id
-        WHERE i."createdAt" > NOW() - INTERVAL '12 months'
-        GROUP BY f."type"
-        ORDER BY count DESC
-      `;
-  
-      // Convertir les BigInt en nombres JavaScript
-      const inscriptionsByType = inscriptionsByTypeRaw.map(item => ({
-        type: item.type,
-        count: Number(item.count)
-      }));
-  
-      // Tendances d'inscriptions par mois et par type
-      const monthlyTrendsByTypeRaw: Array<{ month: Date; type: string; count: bigint }> = await this.prisma.$queryRaw`
-        SELECT
-          DATE_TRUNC('month', i."createdAt") as month,
-          f."type",
-          COUNT(i.id) as count
-        FROM "Inscription" i
-        JOIN "Formation" f ON i."formationId" = f.id
-        WHERE i."createdAt" > NOW() - INTERVAL '12 months'
-        GROUP BY month, f."type"
-        ORDER BY month ASC, f."type"
-      `;
-  
-      // Convertir les BigInt en nombres JavaScript et formater la date
-      const monthlyTrendsByType = monthlyTrendsByTypeRaw.map(item => ({
-        month: item.month instanceof Date ? item.month.toISOString() : item.month,
-        type: item.type,
-        count: Number(item.count)
-      }));
-  
+      // Récupérer les formations
+      const allFormations = await this.formationsService.findAll();
+      
+      // Comptage par type
+      const formationsByType = this.getFormationsByType(allFormations);
+      
+      // Tendances mensuelles par type
+      const monthlyTrendsByType = this.getMonthlyTrendsByType(allFormations);
+      
       return {
-        inscriptionsByType,
+        formationsByType,
         monthlyTrendsByType
       };
     } catch (error) {
-      this.logger.error(`Erreur lors de la récupération des tendances d'inscription : ${error.message}`, error.stack);
+      this.logger.error(`Erreur lors de la récupération des tendances de formation : ${error.message}`, error.stack);
       throw error;
     }
+  }
+
+  private getMonthlyTrendsByType(formations: any[]): any[] {
+    // Récupérer tous les types de formation
+    const allTypes = Array.from(new Set(formations.map(f => f.type)));
+    
+    // Créer les plages de date pour les 12 derniers mois
+    const now = new Date();
+    const months: { start: Date; end: Date; yearMonth: string }[] = [];
+    
+    for (let i = 11; i >= 0; i--) {
+      const month = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const monthEnd = new Date(now.getFullYear(), now.getMonth() - i + 1, 0, 23, 59, 59);
+      const yearMonth = `${month.getFullYear()}-${String(month.getMonth() + 1).padStart(2, '0')}`;
+      months.push({ start: month, end: monthEnd, yearMonth });
+    }
+    
+    // Résultats
+    const result: Array<{ month: string; type: string; count: number }> = [];
+    
+    // Pour chaque mois et type
+    months.forEach(({ start, end, yearMonth }) => {
+      allTypes.forEach(type => {
+        const count = formations.filter(f => {
+          const date = new Date(f.dateDebut);
+          return f.type === type && date >= start && date <= end;
+        }).length;
+        
+        result.push({
+          month: yearMonth,
+          type,
+          count
+        });
+      });
+    });
+    
+    return result;
   }
 }
