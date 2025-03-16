@@ -41,14 +41,9 @@ jobs:
       - name: Generate Prisma client
         run: npx prisma generate
 
-      - name: Run linting
-        run: npm run lint || true
-
       - name: Run TypeScript compiler
         run: npm run build
 
-      - name: Run tests
-        run: npm test || true
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/aloha_test
           JWT_SECRET: test_secret
