@@ -14,7 +14,7 @@ export class CreateImageDto {
   @ApiProperty({
     enum: Category,
     description: 'Catégorie de l\'image',
-    example: Category.formations,
+    example: Category.Formations,
   })
   @IsEnum(Category)
   @IsNotEmpty()

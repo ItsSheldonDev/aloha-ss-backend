@@ -12,7 +12,7 @@ import * as sharp from 'sharp';
 export class GalleryService {
   private readonly logger = new Logger(GalleryService.name);
   private readonly uploadDirectory = path.join(process.cwd(), 'public/uploads/galerie');
-  private readonly maxFileSize = 5 * 1024 * 1024; // 5MB
+  private readonly maxFileSize = 20 * 1024 * 1024; // 20MB
   private readonly allowedMimetypes = ['image/jpeg', 'image/png', 'image/webp'];
   private readonly compressionQuality = 80; // Qualité de compression (1-100)
   private readonly maxWidth = 1920; // Largeur maximale pour les images

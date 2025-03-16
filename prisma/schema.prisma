@@ -82,9 +82,9 @@ enum DocumentCategory {
 }
 
 enum Category {
-  formations
-  activites
-  evenements
+  Formations
+  Sauvetage_Sportif
+  Evenements
 }
 
 enum Role {

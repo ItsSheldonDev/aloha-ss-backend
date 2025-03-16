@@ -1419,9 +1419,9 @@
         ]
       }
     },
-    "/api/admin/dashboard/inscription-trends": {
+    "/api/admin/dashboard/formation-trends": {
       "get": {
-        "operationId": "DashboardController_getInscriptionTrends",
+        "operationId": "DashboardController_getFormationTrends",
         "parameters": [],
         "responses": {
           "200": {
@@ -1436,7 +1436,7 @@
             "bearer": []
           }
         ],
-        "summary": "Récupérer les tendances d'inscription",
+        "summary": "Récupérer les tendances des formations",
         "tags": [
           "dashboard"
         ]
@@ -1460,7 +1460,7 @@
   },
   "info": {
     "title": "API Aloha Secourisme",
-    "description": "\n      API REST complète pour la gestion de l'application Aloha Secourisme.\n      \n      Cette API permet de gérer les formations, les inscriptions, les documents, \n      la galerie d'images et l'administration du système.\n      \n      ## Authentification\n      \n      La plupart des endpoints nécessitent une authentification par token JWT.\n      Pour vous authentifier, utilisez l'endpoint `/api/auth/login` pour obtenir un token,\n      puis incluez ce token dans l'en-tête d'autorisation de vos requêtes.\n      \n      ## Rôles\n      \n      - **Accès public** : Accessible sans authentification\n      - **Admin** : Nécessite d'être connecté avec un compte administrateur\n      - **Super Admin** : Nécessite d'être connecté avec un compte super administrateur\n      \n      ## Modules principaux\n      \n      - **Formations** : Gestion des sessions de formation\n      - **Inscriptions** : Gestion des inscriptions aux formations\n      - **Documents** : Gestion des documents téléchargeables\n      - **Galerie** : Gestion des images de la galerie\n      - **News** : Gestion des actualités\n      - **Admin/Users** : Gestion des utilisateurs administrateurs\n      - **Dashboard** : Statistiques et tableaux de bord\n      - **Settings** : Paramètres du système\n      - **Database** : Export/import de la base de données\n    ",
+    "description": "\n      API REST complète pour la gestion de l'application Aloha Secourisme.\n      \n      Cette API permet de gérer les formations, les inscriptions, les documents, \n      la galerie d'images et l'administration du système.\n      \n      ## Authentification\n      \n      La plupart des endpoints nécessitent une authentification par token JWT.\n      Pour vous authentifier, utilisez l'endpoint `/api/auth/login` pour obtenir un token,\n      puis incluez ce token dans l'en-tête d'autorisation de vos requêtes.\n      \n      ## Rôles\n      \n      - **Accès public** : Accessible sans authentification\n      - **Admin** : Nécessite d'être connecté avec un compte administrateur\n      - **Super Admin** : Nécessite d'être connecté avec un compte super administrateur\n      \n      ## Modules principaux\n      \n      - **Formations** : Gestion des sessions de formation via Excel\n      - **Documents** : Gestion des documents téléchargeables\n      - **Galerie** : Gestion des images de la galerie\n      - **News** : Gestion des actualités\n      - **Admin/Users** : Gestion des utilisateurs administrateurs\n      - **Dashboard** : Statistiques et tableaux de bord\n      - **Settings** : Paramètres du système\n      - **Database** : Export/import de la base de données\n    ",
     "version": "1.0.0",
     "contact": {
       "name": "Aloha Secourisme",
