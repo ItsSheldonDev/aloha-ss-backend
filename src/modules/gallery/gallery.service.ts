@@ -1,4 +1,3 @@
-// src/gallery/gallery.service.ts
 import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateImageDto } from './dto/create-image.dto';
@@ -7,6 +6,7 @@ import { Image, Category } from '@prisma/client';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import * as sharp from 'sharp';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class GalleryService {
@@ -16,9 +16,16 @@ export class GalleryService {
   private readonly allowedMimetypes = ['image/jpeg', 'image/png', 'image/webp'];
   private readonly compressionQuality = 80; // Qualité de compression (1-100)
   private readonly maxWidth = 1920; // Largeur maximale pour les images
+  private readonly apiBaseUrl: string;
 
-  constructor(private readonly prisma: PrismaService) {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly configService: ConfigService
+  ) {
     this.ensureUploadDirectory();
+    
+    // Récupérer l'URL de base de l'API depuis la configuration ou utiliser une valeur par défaut
+    this.apiBaseUrl = this.configService.get<string>('API_BASE_URL') || 'https://api.aloha-secourisme.fr';
   }
 
   private async ensureUploadDirectory(): Promise<void> {
@@ -148,7 +155,7 @@ export class GalleryService {
               category: cat,
               images: categoryImages.map(img => ({
                 ...img,
-                url: `/uploads/galerie/${img.filename}`,
+                url: `${this.apiBaseUrl}/api/streaming/galerie/${img.filename}`,
               })),
             };
           })
@@ -167,7 +174,7 @@ export class GalleryService {
 
         return randomImages.map(img => ({
           ...img,
-          url: `/uploads/galerie/${img.filename}`,
+          url: `${this.apiBaseUrl}/api/streaming/galerie/${img.filename}`,
         }));
       }
 
@@ -187,7 +194,7 @@ export class GalleryService {
 
       return images.map(image => ({
         ...image,
-        url: `/uploads/galerie/${image.filename}`,
+        url: `${this.apiBaseUrl}/api/streaming/galerie/${image.filename}`,
       }));
     } catch (error) {
       this.logger.error(`Erreur lors de la récupération des images : ${error.message}`, error.stack);

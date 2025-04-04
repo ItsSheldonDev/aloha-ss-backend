@@ -2,6 +2,7 @@
 /dist
 /node_modules
 /build
+/public/uploads
 
 # Logs
 logs
@@ -27,6 +28,7 @@ lerna-debug.log*
 *.launch
 .settings/
 *.sublime-workspace
+ecosystem.config.js
 
 # IDE - VSCode
 .vscode/*
@@ -37,10 +39,6 @@ lerna-debug.log*
 
 # dotenv environment variable files
 .env
-.env.development.local
-.env.test.local
-.env.production.local
-.env.local
 
 # temp directory
 .temp

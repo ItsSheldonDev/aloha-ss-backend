@@ -65,12 +65,14 @@ async function bootstrap() {
   app.enableCors({
     origin: process.env.NODE_ENV === 'development' 
       ? 'http://localhost:4000' // Pour le développement local
-      : 'https://aloha-secourisme.fr', // Remplace par ton domaine en production
+      : ['https://aloha-secourisme.fr','http://localhost:3000','http://localhost:5173'], // Remplace par ton domaine en production
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     allowedHeaders: 'Authorization,Content-Type,Accept',
     credentials: true, // Autoriser les cookies/authentification si nécessaire
     maxAge: 86400, // Cache les pré-vérifications CORS pendant 24 heures
   });
+
+  
   
   // Servir les fichiers statiques avec un préfixe explicite
   app.useStaticAssets(join(process.cwd(), 'public'), {

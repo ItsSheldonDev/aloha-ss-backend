@@ -4,6 +4,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 import { Role } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import * as fs from 'fs';
@@ -139,6 +140,47 @@ export class UsersService {
       return result;
     } catch (error) {
       this.logger.error(`Erreur lors de la mise à jour d'un administrateur : ${error.message}`, error.stack);
+      throw error;
+    }
+  }
+
+  async updateProfile(id: string, updateProfileDto: UpdateProfileDto): Promise<any> {
+    try {
+      const user = await this.prisma.admin.findUnique({ where: { id } });
+  
+      if (!user) {
+        throw new NotFoundException(`Administrateur avec l'ID ${id} non trouvé`);
+      }
+  
+      // Vérifier si l'email existe déjà (seulement s'il est modifié)
+      if (updateProfileDto.email && updateProfileDto.email !== user.email) {
+        const emailExists = await this.prisma.admin.findUnique({ 
+          where: { email: updateProfileDto.email } 
+        });
+        
+        if (emailExists) {
+          throw new ConflictException('Cet email est déjà utilisé');
+        }
+      }
+  
+      // Mise à jour du profil
+      const updatedUser = await this.prisma.admin.update({
+        where: { id },
+        data: updateProfileDto,
+        select: {
+          id: true,
+          email: true,
+          nom: true,
+          prenom: true,
+          role: true,
+          avatar: true,
+          createdAt: true,
+        },
+      });
+  
+      return updatedUser;
+    } catch (error) {
+      this.logger.error(`Erreur lors de la mise à jour du profil : ${error.message}`, error.stack);
       throw error;
     }
   }

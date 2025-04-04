@@ -14,6 +14,7 @@ import { SettingsModule } from './modules/settings/settings.module';
 import { DatabaseModule } from './modules/database/database.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { HealthModule } from './modules/health/health.module';
+import { StreamingModule } from './modules/streaming/streaming.module';
 
 @Module({
   imports: [
@@ -33,7 +34,8 @@ import { HealthModule } from './modules/health/health.module';
     SettingsModule,
     DatabaseModule,
     DashboardModule,
-    HealthModule
+    HealthModule,
+    StreamingModule
   ],
 })
 export class AppModule {}

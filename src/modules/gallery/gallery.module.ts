@@ -1,14 +1,15 @@
-// src/gallery/gallery.module.ts
 import { Module } from '@nestjs/common';
 import { GalleryController } from './gallery.controller';
 import { GalleryService } from './gallery.service';
 import { MulterModule } from '@nestjs/platform-express';
-import { memoryStorage } from 'multer'; // Importer memoryStorage
+import { memoryStorage } from 'multer';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule, // Importer ConfigModule pour utiliser ConfigService
     MulterModule.register({
-      storage: memoryStorage(), // Utiliser memoryStorage au lieu de diskStorage
+      storage: memoryStorage(),
       fileFilter: (req, file, callback) => {
         const allowedTypes = /jpg|jpeg|png|webp/;
         const isValid = allowedTypes.test(file.mimetype);

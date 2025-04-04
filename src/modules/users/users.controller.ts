@@ -19,6 +19,7 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { SuperAdminAuthGuard } from '../auth/guards/superadmin-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -66,8 +67,8 @@ export class UsersController {
   @ApiResponse({ status: 200, description: 'Profil récupéré avec succès' })
   @ApiResponse({ status: 401, description: 'Non autorisé' })
   getMe(@Request() req) {
-    this.logger.log(`Récupération du profil pour l'utilisateur ${req.user.id}`);
-    return this.usersService.getMe(req);
+    // Passer l'ID de l'utilisateur au lieu de l'objet request complet
+    return this.usersService.getMe(req.user.id);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -83,40 +84,16 @@ export class UsersController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Put('profile/avatar')
-  @UseInterceptors(FileInterceptor('avatar'))
-  @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        avatar: {
-          type: 'string',
-          format: 'binary',
-        },
-      },
-    },
-  })
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Mettre à jour son propre avatar' })
-  @ApiResponse({ status: 200, description: 'Avatar mis à jour avec succès' })
-  @ApiResponse({ status: 400, description: 'Fichier manquant ou invalide' })
-  @ApiResponse({ status: 401, description: 'Non autorisé' })
-  async updateAvatar(@Request() req, @UploadedFile() file: Express.Multer.File) {
-    this.logger.log(`Mise à jour de l'avatar pour l'utilisateur ${req.user.id}`);
-    if (!file) {
-      this.logger.warn('Aucun fichier fourni dans la requête');
-      throw new BadRequestException('Aucun fichier fourni');
-    }
-    this.logger.log('Fichier reçu:', {
-      originalname: file.originalname,
-      size: file.size,
-      mimetype: file.mimetype,
-      bufferExists: !!file.buffer,
-      bufferLength: file.buffer ? file.buffer.length : 'N/A',
-    });
-    return this.usersService.updateAvatar(req.user.id, file);
-  }
+@Put('profile/infos')
+@ApiBearerAuth()
+@ApiOperation({ summary: 'Mettre à jour ses propres informations de profil' })
+@ApiResponse({ status: 200, description: 'Profil mis à jour avec succès' })
+@ApiResponse({ status: 400, description: 'Données invalides' })
+@ApiResponse({ status: 401, description: 'Non autorisé' })
+updateProfile(@Request() req, @Body() updateProfileDto: UpdateProfileDto) {
+  this.logger.log(`Mise à jour du profil pour l'utilisateur ${req.user.id}`);
+  return this.usersService.updateProfile(req.user.id, updateProfileDto);
+}
 
   @UseGuards(JwtAuthGuard)
   @Get(':id')
