@@ -10,19 +10,18 @@ export function setupSwagger(app: INestApplication): void {
     .setVersion('1.0.0')
     .setContact('Aloha Secourisme', 'https://www.aloha-secourisme.fr', 'contact@aloha-secourisme.fr')
     .setLicense('Propriétaire', 'https://www.aloha-secourisme.fr')
-    .addServer('http://localhost:4000', 'Serveur local')
     .addServer('https://api.aloha-secourisme.fr', 'Serveur de production')
     .addBearerAuth(
-      { 
-        type: 'http', 
-        scheme: 'bearer', 
+      {
+        type: 'http',
+        scheme: 'bearer',
         bearerFormat: 'JWT',
         description: 'Entrez votre token JWT ici',
       },
       'JWT-auth', // Nom de cette sécurité pour référence
     )
     .build();
-  
+ 
   // Options personnalisées pour l'interface Swagger UI
   const customOptions: SwaggerCustomOptions = {
     swaggerOptions: {
@@ -39,10 +38,12 @@ export function setupSwagger(app: INestApplication): void {
     customCss: '.swagger-ui .topbar { display: none }', // Masquer la barre supérieure
     explorer: true, // Activer l'explorateur pour une meilleure navigation
     swaggerUrl: '/docs-json',
+    // Activer l'actualisation automatique de la documentation
+    useGlobalPrefix: true, // Respecter le préfixe global de l'API
   };
-  
+ 
   const document = SwaggerModule.createDocument(app, config);
-  
+ 
   // Modifier les définitions de sécurité dans le document Swagger
   document.components = {
     ...document.components,
@@ -55,7 +56,7 @@ export function setupSwagger(app: INestApplication): void {
       }
     }
   };
-  
+ 
   // Appliquer la sécurité à tous les endpoints qui ont la directive ApiBearerAuth
   for (const path in document.paths) {
     for (const method in document.paths[path]) {
@@ -67,7 +68,14 @@ export function setupSwagger(app: INestApplication): void {
       }
     }
   }
-  
+ 
+  // Ajouter l'option pour actualiser la documentation en cours d'exécution
+  app.use('/docs-json', (req, res) => {
+    // Régénérer le document Swagger à chaque requête
+    const updatedDocument = SwaggerModule.createDocument(app, config);
+    res.json(updatedDocument);
+  });
+
   SwaggerModule.setup('docs', app, document, customOptions);
 
   // Logs informatifs
